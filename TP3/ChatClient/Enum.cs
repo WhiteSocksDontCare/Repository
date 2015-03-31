@@ -11,5 +11,6 @@ namespace ChatClient
         Login,
         Logout,
         Message,
+        test
     }
 }
