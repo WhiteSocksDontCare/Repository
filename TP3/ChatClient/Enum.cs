@@ -11,6 +11,5 @@ namespace ChatClient
         Login,
         Logout,
         Message,
-        salut
     }
 }
