@@ -1,0 +1,16 @@
+d:\documents\Visual Studio 2013\Projects\ChatClient\ChatClient\bin\Debug\ChatClient.exe.config
+d:\documents\Visual Studio 2013\Projects\ChatClient\ChatClient\bin\Debug\ChatClient.exe
+d:\documents\Visual Studio 2013\Projects\ChatClient\ChatClient\bin\Debug\ChatClient.pdb
+d:\documents\Visual Studio 2013\Projects\ChatClient\ChatClient\obj\Debug\App.g.cs
+d:\documents\Visual Studio 2013\Projects\ChatClient\ChatClient\obj\Debug\ChatClient_MarkupCompile.cache
+d:\documents\Visual Studio 2013\Projects\ChatClient\ChatClient\obj\Debug\ChatClient.g.resources
+d:\documents\Visual Studio 2013\Projects\ChatClient\ChatClient\obj\Debug\ChatClient.Properties.Resources.resources
+d:\documents\Visual Studio 2013\Projects\ChatClient\ChatClient\obj\Debug\ChatClient.csproj.GenerateResource.Cache
+d:\documents\Visual Studio 2013\Projects\ChatClient\ChatClient\obj\Debug\ChatClient.exe
+d:\documents\Visual Studio 2013\Projects\ChatClient\ChatClient\obj\Debug\ChatClient.pdb
+d:\documents\Visual Studio 2013\Projects\ChatClient\ChatClient\obj\Debug\ChatClient.csprojResolveAssemblyReference.cache
+D:\Documents\Visual Studio 2013\Projects\ChatClient\ChatClient\obj\Debug\Login.baml
+D:\Documents\Visual Studio 2013\Projects\ChatClient\ChatClient\obj\Debug\Login.g.cs
+D:\Documents\Visual Studio 2013\Projects\TP3\ChatClient\bin\Debug\ChatClient.exe.config
+D:\Documents\Visual Studio 2013\Projects\TP3\ChatClient\obj\Debug\ChatClient.exe
+D:\Documents\Visual Studio 2013\Projects\TP3\ChatClient\obj\Debug\ChatClient.pdb
