@@ -5,8 +5,6 @@ using System.Text;
 using System.Threading;
 using System.Windows.Controls.Primitives;
 
-//Alex etait ici
-
 namespace ChatClient
 {
     public class StateObject
