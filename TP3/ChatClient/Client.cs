@@ -40,7 +40,7 @@ namespace ChatClient
                 var client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
                 client.BeginConnect(remoteEP, ConnectCallback, client);
-                connectDone.WaitOne();
+                connectDone.WaitOne(); 
 
                 Send(client, Type.Login, name);
                 sendDone.WaitOne();
