@@ -14,16 +14,3 @@ D:\Documents\Visual Studio 2013\Projects\ChatClient\ChatClient\obj\Debug\Login.g
 D:\Documents\Visual Studio 2013\Projects\TP3\ChatClient\bin\Debug\ChatClient.exe.config
 D:\Documents\Visual Studio 2013\Projects\TP3\ChatClient\obj\Debug\ChatClient.exe
 D:\Documents\Visual Studio 2013\Projects\TP3\ChatClient\obj\Debug\ChatClient.pdb
-C:\Users\Guillaume\Source\Repos\Repository\TP3\ChatClient\bin\Debug\ChatClient.exe.config
-C:\Users\Guillaume\Source\Repos\Repository\TP3\ChatClient\bin\Debug\ChatClient.exe
-C:\Users\Guillaume\Source\Repos\Repository\TP3\ChatClient\bin\Debug\ChatClient.pdb
-C:\Users\Guillaume\Source\Repos\Repository\TP3\ChatClient\obj\Debug\ChatClient.csprojResolveAssemblyReference.cache
-C:\Users\Guillaume\Source\Repos\Repository\TP3\ChatClient\obj\Debug\Login.baml
-C:\Users\Guillaume\Source\Repos\Repository\TP3\ChatClient\obj\Debug\Login.g.cs
-C:\Users\Guillaume\Source\Repos\Repository\TP3\ChatClient\obj\Debug\App.g.cs
-C:\Users\Guillaume\Source\Repos\Repository\TP3\ChatClient\obj\Debug\ChatClient_MarkupCompile.cache
-C:\Users\Guillaume\Source\Repos\Repository\TP3\ChatClient\obj\Debug\ChatClient.g.resources
-C:\Users\Guillaume\Source\Repos\Repository\TP3\ChatClient\obj\Debug\ChatClient.Properties.Resources.resources
-C:\Users\Guillaume\Source\Repos\Repository\TP3\ChatClient\obj\Debug\ChatClient.csproj.GenerateResource.Cache
-C:\Users\Guillaume\Source\Repos\Repository\TP3\ChatClient\obj\Debug\ChatClient.exe
-C:\Users\Guillaume\Source\Repos\Repository\TP3\ChatClient\obj\Debug\ChatClient.pdb
