@@ -74,10 +74,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Communication\WindowManager.cs" />
     <Compile Include="Container\Container.cs" />
     <Compile Include="Container\IContainer.cs" />
     <Compile Include="Container\MicrokernelContainer.cs" />
+    <Compile Include="Navigation\NavigateToViewCommand.cs" />
+    <Compile Include="Navigation\WpfCommand.cs" />
+    <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
@@ -151,9 +153,7 @@
       <Name>ChatCommunication</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="ViewModels\Interfaces\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
