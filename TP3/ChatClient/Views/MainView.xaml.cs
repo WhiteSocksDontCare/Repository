@@ -10,16 +10,17 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace ChatClient.Views
 {
     /// <summary>
-    /// Logique d'interaction pour ProfileView.xaml
+    /// Logique d'interaction pour MainView.xaml
     /// </summary>
-    public partial class ProfileView : UserControl
+    public partial class MainView : UserControl
     {
-        public ProfileView()
+        public MainView()
         {
             InitializeComponent();
         }

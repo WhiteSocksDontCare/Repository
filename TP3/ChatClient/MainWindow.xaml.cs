@@ -29,7 +29,8 @@ namespace ChatClient.Views
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            DataContext = Container.GetA<LoginViewModel>();
+            DataContext = Container.GetA<MainViewModel>();
+            Container.GetA<MainViewModel>().NavigateToView(Container.GetA<LoginViewModel>());
         }
     }
 }

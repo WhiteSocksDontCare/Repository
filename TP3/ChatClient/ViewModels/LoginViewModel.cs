@@ -20,7 +20,7 @@ namespace ChatClient.ViewModels
             this.LoginCommand = new DelegateCommand<object>(Login);
             this.SubscribeCommand = new DelegateCommand<object>(Subscribe);
             this.user = new User();
-            Client.EstablishConnection();
+            //Client.EstablishConnection();
         }
 
         public ICommand LoginCommand { get; private set; }
