@@ -22,7 +22,7 @@ namespace ChatClient
         public StringBuilder sb = new StringBuilder();
     }
 
-    class Client
+    public class Client
     {
         private const int port = 11000;
 

@@ -1,8 +1,14 @@
 ﻿<Application x:Class="ChatClient.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             StartupUri="Views/LoginView.xaml">
+             xmlns:ViewModels="clr-namespace:ChatClient.ViewModels"
+             xmlns:Views="clr-namespace:ChatClient.Views"
+             StartupUri="Views/MainWindow.xaml">
     <Application.Resources>
+        
+        <DataTemplate DataType="{x:Type ViewModels:LoginViewModel}">
+            <Views:LoginView />
+        </DataTemplate>
          
     </Application.Resources>
 </Application>
