@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using ChatCommunication;
 using System.Windows.Controls;
+using MVVM.Container;
 
 namespace ChatClient.ViewModels
 {
@@ -20,7 +21,6 @@ namespace ChatClient.ViewModels
             this.LoginCommand = new DelegateCommand<object>(Login);
             this.SubscribeCommand = new DelegateCommand<object>(Subscribe);
             this.user = new User();
-            //Client.EstablishConnection();
         }
 
         public ICommand LoginCommand { get; private set; }
@@ -33,6 +33,11 @@ namespace ChatClient.ViewModels
 
         private void Login(object password)
         {
+            if (!Client.IsConnected())
+            {
+                Client.EstablishConnection();
+            }
+
             //user.Password = Encode_Pass(((PasswordBox)password).Password);
             user.Password = ((PasswordBox)password).Password;
             Profile profile = Client.LogClient(user);
@@ -40,11 +45,17 @@ namespace ChatClient.ViewModels
             if(profile != null)
             {
                 //move to lobby
+                Container.GetA<MainViewModel>().NavigateToView(Container.GetA<LobbyViewModel>());
             }
         }
 
         private void Subscribe(object password)
         {
+            if (!Client.IsConnected())
+            {
+                Client.EstablishConnection();
+            }
+
             //user.Password = Encode_Pass(((PasswordBox)password).Password);
             user.Password = ((PasswordBox)password).Password;
             Profile profile = Client.SubClient(user);

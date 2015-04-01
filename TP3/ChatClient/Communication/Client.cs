@@ -31,8 +31,12 @@ namespace ChatClient
         private static readonly ManualResetEvent receiveDone = new ManualResetEvent(false);
 
         private static Object response;
-        private static Socket client;
+        private static Socket client = null;
 
+        public static bool IsConnected()
+        {
+            return client != null;
+        }
         public static bool EstablishConnection()
         {
              try
