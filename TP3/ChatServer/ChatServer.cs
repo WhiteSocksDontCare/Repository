@@ -88,7 +88,9 @@ namespace ChatServer
 
             var message = Encoding.ASCII.GetString(state.Buffer, 0, bytesRead);
 
-            Console.WriteLine("login" + message);
+            var messageArray = message.Split(new char[] {'!'}, 2);
+            var commandType = messageArray[0];
+            Console.WriteLine(commandType);
             clients[message] = handler;
             Send(clients[message], "salut");
             
