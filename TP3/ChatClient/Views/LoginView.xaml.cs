@@ -23,18 +23,29 @@ namespace ChatClient
     /// </summary>
     public partial class MainWindow : Window
     {
+        User u;
+
         public MainWindow()
         {
             InitializeComponent();
-            User u = new User();
-            
+            u = new User();
+        }
+
+        private string Encode_Pass(string pass)
+        {
+            byte[] data = System.Text.Encoding.ASCII.GetBytes("trYT0" + pass + "H4cKme");
+            data = new System.Security.Cryptography.SHA256Managed().ComputeHash(data);
+            return System.Text.Encoding.ASCII.GetString(data);
         }
 
         private void BTN_Connect_Click(object sender, RoutedEventArgs e)
         {
-            if (!Client.StartClient(TB_Username_Login.Text))
+            u.Pseudo = TB_Username_Login.Text;
+            u.Password = Encode_Pass(PB_Password_Login.Password);
+
+            if (!Client.StartClient(u))
             {
-                LB_Response.Content = "Mauvais username";
+
             }
         }
     }
