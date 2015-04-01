@@ -20,6 +20,7 @@ namespace ChatClient.ViewModels
             this.LoginCommand = new DelegateCommand<object>(Login);
             this.SubscribeCommand = new DelegateCommand<object>(Subscribe);
             this.user = new User();
+            Client.EstablishConnection();
         }
 
         public ICommand LoginCommand { get; private set; }
@@ -32,8 +33,11 @@ namespace ChatClient.ViewModels
 
         private void Login(object password)
         {
-            user.Password = Encode_Pass(((PasswordBox)password).Password);
-            if(Client.StartClient(user))
+            //user.Password = Encode_Pass(((PasswordBox)password).Password);
+            user.Password = ((PasswordBox)password).Password;
+            Profile profile = Client.LogClient(user);
+
+            if(profile != null)
             {
                 //move to lobby
             }
@@ -41,8 +45,11 @@ namespace ChatClient.ViewModels
 
         private void Subscribe(object password)
         {
-            user.Password = Encode_Pass(((PasswordBox)password).Password);
-            if (Client.StartClient(user))
+            //user.Password = Encode_Pass(((PasswordBox)password).Password);
+            user.Password = ((PasswordBox)password).Password;
+            Profile profile = Client.SubClient(user);
+            
+            if (profile != null)
             {
                 //move to profil creation
             }
@@ -50,9 +57,9 @@ namespace ChatClient.ViewModels
         }
         private string Encode_Pass(string pass)
         {
-            byte[] data = System.Text.Encoding.ASCII.GetBytes("trYT0" + pass + "H4cKme");
+            byte[] data = System.Text.Encoding.UTF8.GetBytes("trYT0" + pass + "H4cKme");
             data = new System.Security.Cryptography.SHA256Managed().ComputeHash(data);
-            return System.Text.Encoding.ASCII.GetString(data);
+            return System.Text.Encoding.UTF8.GetString(data);
         }
 
     }
