@@ -62,11 +62,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="LobbyView.xaml">
+    <Page Include="Views\LobbyView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Login.xaml">
+    <Page Include="Views\Login.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -74,12 +74,12 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Client.cs" />
-    <Compile Include="LobbyView.xaml.cs">
+    <Compile Include="Communication\Client.cs" />
+    <Compile Include="Views\LobbyView.xaml.cs">
       <DependentUpon>LobbyView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="LobbyViewModel.cs" />
-    <Compile Include="Login.xaml.cs">
+    <Compile Include="ViewModels\LobbyViewModel.cs" />
+    <Compile Include="Views\Login.xaml.cs">
       <DependentUpon>Login.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
