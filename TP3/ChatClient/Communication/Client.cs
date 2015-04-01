@@ -30,33 +30,75 @@ namespace ChatClient
         private static readonly ManualResetEvent sendDone = new ManualResetEvent(false);
         private static readonly ManualResetEvent receiveDone = new ManualResetEvent(false);
 
-        private static String response = String.Empty;
+        private static Object response;
         private static Socket client;
 
-        public static bool StartClient(User user)
+        public static bool EstablishConnection()
         {
-            try
+             try
             {
                 var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
                 var ipAddress = ipHostInfo.AddressList[1];
                 var remoteEP = new IPEndPoint(ipAddress, port);
 
                 client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-
+                
                 client.BeginConnect(remoteEP, ConnectCallback, client);
-                connectDone.WaitOne(); 
+                connectDone.WaitOne();
 
+                return true;
+            }
+             catch (Exception ex)
+             {
+                 Console.WriteLine(ex.ToString());
+             }
+             return false;
+        }
+        public static Profile LogClient(User user)
+        {
+            try
+            {
                 Send("Login", user.Serialize());
                 sendDone.WaitOne();
 
                 Receive();
                 receiveDone.WaitOne();
-                
-                Console.WriteLine(@"Response received : {0}", response);
 
+                return (Profile)response;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            return null;
+        }
+        public static Profile SubClient(User user)
+        {
+            try
+            {
+                Send("Subscribe", user.Serialize());
+                sendDone.WaitOne();
+
+                Receive();
+                receiveDone.WaitOne();
+                
+                return (Profile)response;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            return null;
+        }
+
+        public static bool DisconnectClient()
+        {
+            try
+            {
                 client.Shutdown(SocketShutdown.Both);
                 client.Close();
-
                 return true;
             }
             catch (Exception ex)
@@ -65,7 +107,6 @@ namespace ChatClient
             }
             return false;
         }
-
         private static void ConnectCallback(IAsyncResult ar)
         {
             try
@@ -115,14 +156,16 @@ namespace ChatClient
             var messageArray = message.Split(new char[] { '!' }, 2);
             var commandType = messageArray[0];
             Console.WriteLine(commandType);
-            
+
             switch (commandType)
             {
                 case "Info":
+                    response = null;
                     var messageInfo = messageArray[1];
                     MessageBox.Show(messageInfo, "Informations", MessageBoxButton.OK, MessageBoxImage.Information);
                     break;
                 case "Error":
+                    response = null;
                     var messageError = messageArray[1];
                     MessageBox.Show(messageError, "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
                     break;
@@ -130,7 +173,7 @@ namespace ChatClient
                     Lobby lobby = messageArray[1].Deserialize<Lobby>();
                     // TODO : Mettre à jour le lobby.
                     break;
-                case "UpdateRoom":                    
+                case "UpdateRoom":
                     Room room = messageArray[1].Deserialize<Room>();
                     // TODO : Mettre à jour la room dans laquelle se trouve l'utilisateur.
                     break;
@@ -138,34 +181,14 @@ namespace ChatClient
                     Profile profile = messageArray[1].Deserialize<Profile>();
                     // TODO : Afficher le profil reçu.
                     break;
+                case "Subscribe":
+                    response = messageArray[1].Deserialize<Profile>();
+                    // TODO : Afficher le form pour qu'il crée son profile.
+                    break;
                 default:
                     throw new Exception("Commande '" + commandType + "' non reconnue.");
             }
-
-            //try
-            //{
-            //    var state = (StateObject) ar.AsyncState;
-            //    var client = state.workSocket;
-
-            //    var bytesRead = client.EndReceive(ar);
-
-            //    if (bytesRead > 0)
-            //    {
-            //        state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
-            //        client.BeginReceive(state.buffer, 0, StateObject.bufferSize, 0, ReceiveCallback, state);
-            //    }
-            //    else
-            //    {
-            //        if (state.sb.Length > 1)
-            //            response = state.sb.ToString();
-
-            //        receiveDone.Set();
-            //    }
-            //}
-            //catch (Exception e)
-            //{
-            //    Console.WriteLine(e.ToString());
-            //}
+            receiveDone.Set();
         }
 
         private static void Send(string commandType, string data)
