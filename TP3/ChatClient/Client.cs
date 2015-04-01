@@ -4,17 +4,18 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Windows.Controls.Primitives;
+using System.Xml.Serialization;
 
 namespace ChatClient
 {
     public class StateObject
     {
-        // Client  socket.
-        public Socket workSocket = null;
+        // Client socket.
+        public Socket WorkSocket = null;
         // Size of receive buffer.
-        public const int bufferSize = 1024;
+        public const int BufferSize = 1024;
         // Receive buffer.
-        public byte[] buffer = new byte[bufferSize];
+        public byte[] Buffer = new byte[BufferSize];
         // Received data string.
         public StringBuilder sb = new StringBuilder();
     }
@@ -84,9 +85,9 @@ namespace ChatClient
         {
             try
             {
-                var state = new StateObject {workSocket = client};
+                var state = new StateObject {WorkSocket = client};
 
-                client.BeginReceive(state.buffer, 0, StateObject.bufferSize, 0, ReceiveCallback, state);
+                client.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0, ReceiveCallback, state);
             }
             catch (Exception e)
             {
@@ -96,30 +97,70 @@ namespace ChatClient
 
         private static void ReceiveCallback(IAsyncResult ar)
         {
-            try
+            // Retrieve the state object and the handler socket
+            // from the asynchronous state object.
+            var state = (StateObject)ar.AsyncState;
+            var handler = state.WorkSocket;
+
+            // Read data from the client socket. 
+            var bytesRead = handler.EndReceive(ar);
+
+            if (bytesRead <= 0) return;
+
+            var message = Encoding.ASCII.GetString(state.Buffer, 0, bytesRead);
+
+            var messageArray = message.Split(new char[] { '!' }, 2);
+            var commandType = messageArray[0];
+            Console.WriteLine(commandType);
+            
+            switch (commandType)
             {
-                var state = (StateObject) ar.AsyncState;
-                var client = state.workSocket;
-
-                var bytesRead = client.EndReceive(ar);
-
-                if (bytesRead > 0)
-                {
-                    state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
-                    client.BeginReceive(state.buffer, 0, StateObject.bufferSize, 0, ReceiveCallback, state);
-                }
-                else
-                {
-                    if (state.sb.Length > 1)
-                        response = state.sb.ToString();
-
-                    receiveDone.Set();
-                }
+                case "Info":
+                    var messageInfo = messageArray[1];
+                    break;
+                case "Error":
+                    var messageError = messageArray[1];
+                    break;
+                case "UpdateLobby":
+                    // TODO : Appeler Deserialize avec le message reçu
+                    var lobby = messageArray[1];
+                    break;
+                case "UpdateRoom":
+                    // TODO : Appeler Deserialize avec le message reçu
+                    var room = messageArray[1];
+                    break;
+                case "UpdateProfile":
+                    // TODO : Appeler Deserialize avec le message reçu
+                    var profile = messageArray[1];
+                    break;
+                default:
+                    throw new Exception("Commande '" + commandType + "' non reconnue.");
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-            }
+
+            //try
+            //{
+            //    var state = (StateObject) ar.AsyncState;
+            //    var client = state.workSocket;
+
+            //    var bytesRead = client.EndReceive(ar);
+
+            //    if (bytesRead > 0)
+            //    {
+            //        state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
+            //        client.BeginReceive(state.buffer, 0, StateObject.bufferSize, 0, ReceiveCallback, state);
+            //    }
+            //    else
+            //    {
+            //        if (state.sb.Length > 1)
+            //            response = state.sb.ToString();
+
+            //        receiveDone.Set();
+            //    }
+            //}
+            //catch (Exception e)
+            //{
+            //    Console.WriteLine(e.ToString());
+            //}
         }
 
         private static void Send(Socket client, string commandType, string data)
