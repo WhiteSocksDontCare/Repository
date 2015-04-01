@@ -78,7 +78,7 @@ namespace ChatCommunication
             }
             catch (Exception ex)
             {
-                throw new Exception("An error occurred during serialization into file" + fileName + ".", ex);
+                //throw new Exception("An error occurred during serialization into file" + fileName + ".", ex);
             }
             finally
             {
@@ -101,7 +101,7 @@ namespace ChatCommunication
             }
             catch (Exception ex)
             {
-                throw new Exception("An error occurred during deserialization from file" + fileName + ".", ex);
+                //throw new Exception("An error occurred during deserialization from file" + fileName + ".", ex);
             }
             finally
             {

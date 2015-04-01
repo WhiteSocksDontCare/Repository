@@ -28,22 +28,37 @@ namespace ChatServer
     class ChatServer
     {
         private static double SAVE_INTERVAL = 600000;  //Intervale de temps entre deux save des listes dans le fichier XML (10 minutes)
+        private static string PROFILES_FILE = "profiles.xml";
+        private static string ROOMS_FILE = "rooms.xml";
+        private static string LIKES_FILE = "likes.xml";
+        private static string USERS_FILE = "users.xml";
+
         private static int i = 0;
         public static ManualResetEvent AllDone = new ManualResetEvent(false);
-        private static Dictionary<string, Socket> clients = new Dictionary<string, Socket>();
+        private static Dictionary<Socket, Profile> onlineClients = new Dictionary<Socket, Profile>();
+
+        private static List<Profile> profiles = new List<Profile>();
+        private static List<Room> rooms = new List<Room>();
+        private static List<Like> likes = new List<Like>();
+        private static List<User> users = new List<User>();
 
         public static void LoadServerInfos()
         {
-            //Test temporaire pour vérifier le fonctionnement des fichiers XML
-            try
-            {
-                ChatCommunication.User test = ChatCommunication.SerializerHelper.DeserializeFromXML<ChatCommunication.User>("test.xml");
-                //Console.Out.WriteLine("Deserialized : Pseudo(" + test.Pseudo + ") Password(" + test.Password + ")");
-            }
-            catch(Exception ex)
-            {
-                Console.Out.WriteLine(ex.InnerException.Message);
-            }
+            List<Profile> tempProfiles;
+            if ((tempProfiles = ChatCommunication.SerializerHelper.DeserializeFromXML<List<Profile>>(PROFILES_FILE)) != null)
+                profiles = tempProfiles;
+
+            List<Room> tempRooms;
+            if ((tempRooms = ChatCommunication.SerializerHelper.DeserializeFromXML<List<Room>>(ROOMS_FILE)) != null)
+                rooms = tempRooms;
+
+            List<Like> tempLikes;
+            if ((tempLikes = ChatCommunication.SerializerHelper.DeserializeFromXML<List<Like>>(LIKES_FILE)) != null)
+                likes = tempLikes;
+
+            List<User> tempUsers;
+            if ((tempUsers = ChatCommunication.SerializerHelper.DeserializeFromXML<List<User>>(USERS_FILE)) != null)
+                users = tempUsers;
         }
         public static void ServerInfosTimer()
         {
@@ -57,28 +72,11 @@ namespace ChatServer
 
         public static void SaveServerInfos(object source, ElapsedEventArgs e)
         {
-            //Test temporaire pour vérifier le fonctionnement des fichiers XML
-            try
-            {
-                ChatCommunication.User test = new ChatCommunication.User();
-                DateTime date = DateTime.Now;
-                test.Pseudo = date.ToLongDateString();
-                test.Password = date.ToLongTimeString();
-                //Console.Out.WriteLine("Serialized : Pseudo(" + test.Pseudo + ") Password(" + test.Password + ")");
-
-                ChatCommunication.SerializerHelper.SerializeToXML(test, "test.xml");
-            }
-            catch (Exception ex)
-            {
-                Console.Out.WriteLine(ex.InnerException.Message);
-            }
+            ChatCommunication.SerializerHelper.SerializeToXML(profiles, PROFILES_FILE);
+            ChatCommunication.SerializerHelper.SerializeToXML(rooms, ROOMS_FILE);
+            ChatCommunication.SerializerHelper.SerializeToXML(likes, LIKES_FILE);
+            ChatCommunication.SerializerHelper.SerializeToXML(users, USERS_FILE);
         }
-
-        private static Dictionary<Socket, Profile> onlineClients = new Dictionary<Socket, Profile>();
-        private static List<Profile> profiles = new List<Profile>();
-        private static List<Room> rooms = new List<Room>();
-        private static List<Like> likes = new List<Like>();
-        private static List<User> users = new List<User>();
 
         public static void StartListening()
         {
