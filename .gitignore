@@ -123,7 +123,7 @@ publish/
 *.azurePubxml
 
 # NuGet Packages Directory
-packages/
+#packages/
 ## TODO: If the tool you use requires repositories.config uncomment the next line
 #!packages/repositories.config
 
@@ -171,6 +171,6 @@ UpgradeLog*.htm
 
 # Microsoft Fakes
 FakesAssemblies/
-/TP3/*.suo
+TP3/*.suo
 *.suo
-/TP3/*.suo
+TP3/*.suo
