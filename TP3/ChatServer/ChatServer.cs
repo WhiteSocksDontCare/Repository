@@ -270,7 +270,7 @@ namespace ChatServer
         /// <param name="user"></param>
         private static void Subscribe(Socket handler, User user)
         {
-            var bidon = new Profile { Pseudo = user.Pseudo };
+            var bidon = new Profile { Pseudo = user.Pseudo, IDRoom = -1 };
             onlineClients[handler] = bidon;
             users.Add(user);
             Send(handler, "Subscribe", bidon.Serialize());
