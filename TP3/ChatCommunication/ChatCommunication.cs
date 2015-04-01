@@ -12,22 +12,22 @@ namespace ChatCommunication
 {
     public class Lobby
     {
-        Profile ClientProfile { get; set; }
-        List<Profile> OtherUsers { get; set; }
-        List<Room> AllRooms { get; set; }
+        public Profile ClientProfile { get; set; }
+        public List<Profile> OtherUsers { get; set; }
+        public List<Room> AllRooms { get; set; }
     }
 
     public class Profile
     {
-        string Pseudo { get; set; }
-        string LastName { get; set; }
-        string FirstName { get; set; }
-        int IDRoom { get; set; }
-        int NbLike { get; set; }
-        int NbDislike { get; set; }
-        int NbMessage { get; set; }
-        int NbDeletedMessage { get; set; }
-        bool IsConnected { get; set; }
+        public string Pseudo { get; set; }
+        public string LastName { get; set; }
+        public string FirstName { get; set; }
+        public int IDRoom { get; set; }
+        public int NbLike { get; set; }
+        public int NbDislike { get; set; }
+        public int NbMessage { get; set; }
+        public int NbDeletedMessage { get; set; }
+        public bool IsConnected { get; set; }
 
         [XmlIgnore]
         public BitmapSource Avatar { get; set; }
@@ -73,36 +73,36 @@ namespace ChatCommunication
 
     public class Room
     {
-        int IDRoom { get; set; }
-        string Name { get; set; }
-        string Description { get; set; }
-        bool IsDeleted { get; set; }
-        List<Profile> SubscribedUsers { get; set; }
-        List<Message> Messages { get; set; }
+        public int IDRoom { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public bool IsDeleted { get; set; }
+        public List<Profile> SubscribedUsers { get; set; }
+        public List<Message> Messages { get; set; }
     }
 
     public class User
     {
-        string Pseudo { get; set; }
-        string Password { get; set; }
+        public string Pseudo { get; set; }
+        public string Password { get; set; }
     }
 
     public class Message
     {
-        int IDMessage { get; set; }
-        string Text { get; set; }
-        bool IsDeleted{ get; set; }
-        string Pseudo { get; set; }
-        int IDRoom { get; set; }
-        int NbLike { get; set; }
-        int NbDislike { get; set; }
+        public int IDMessage { get; set; }
+        public string Text { get; set; }
+        public bool IsDeleted { get; set; }
+        public string Pseudo { get; set; }
+        public int IDRoom { get; set; }
+        public int NbLike { get; set; }
+        public int NbDislike { get; set; }
     }
 
     public class Like
     {
-        int IDMessage { get; set; }
-        string Pseudo { get; set; }
-        bool IsLike { get; set; }
+        public int IDMessage { get; set; }
+        public string Pseudo { get; set; }
+        public bool IsLike { get; set; }
     }
 
 }
