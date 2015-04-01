@@ -66,7 +66,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Login.xaml">
+    <Page Include="Views\LoginView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -75,12 +75,13 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Communication\Client.cs" />
+    <Compile Include="ViewModels\LoginViewModel.cs" />
     <Compile Include="Views\LobbyView.xaml.cs">
       <DependentUpon>LobbyView.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModels\LobbyViewModel.cs" />
-    <Compile Include="Views\Login.xaml.cs">
-      <DependentUpon>Login.xaml</DependentUpon>
+    <Compile Include="Views\LoginView.xaml.cs">
+      <DependentUpon>LoginView.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
