@@ -6,6 +6,7 @@ using System.Threading;
 using System.Windows.Controls.Primitives;
 using System.Xml.Serialization;
 using ChatCommunication;
+using System.Windows;
 
 namespace ChatClient
 {
@@ -119,21 +120,23 @@ namespace ChatClient
             {
                 case "Info":
                     var messageInfo = messageArray[1];
+                    MessageBox.Show(messageInfo, "Informations", MessageBoxButton.OK, MessageBoxImage.Information);
                     break;
                 case "Error":
                     var messageError = messageArray[1];
+                    MessageBox.Show(messageError, "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
                     break;
                 case "UpdateLobby":
-                    // TODO : Appeler Deserialize avec le message reçu
-                    var lobby = messageArray[1];
+                    Lobby lobby = messageArray[1].Deserialize<Lobby>();
+                    // TODO : Mettre à jour le lobby.
                     break;
-                case "UpdateRoom":
-                    // TODO : Appeler Deserialize avec le message reçu
-                    var room = messageArray[1];
+                case "UpdateRoom":                    
+                    Room room = messageArray[1].Deserialize<Room>();
+                    // TODO : Mettre à jour la room dans laquelle se trouve l'utilisateur.
                     break;
                 case "UpdateProfile":
-                    // TODO : Appeler Deserialize avec le message reçu
-                    var profile = messageArray[1];
+                    Profile profile = messageArray[1].Deserialize<Profile>();
+                    // TODO : Afficher le profil reçu.
                     break;
                 default:
                     throw new Exception("Commande '" + commandType + "' non reconnue.");
