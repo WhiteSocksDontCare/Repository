@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Controls.Primitives;
 using System.Xml.Serialization;
+using ChatCommunication;
 
 namespace ChatClient
 {
@@ -30,7 +31,7 @@ namespace ChatClient
 
         private static String response = String.Empty;
 
-        public static bool StartClient(string name)
+        public static bool StartClient(User user)
         {
             try
             {
@@ -43,7 +44,7 @@ namespace ChatClient
                 client.BeginConnect(remoteEP, ConnectCallback, client);
                 connectDone.WaitOne(); 
 
-                Send(client, "Login", name);
+                Send(client, "Login", user.Serialize());
                 sendDone.WaitOne();
 
                 Receive(client);
