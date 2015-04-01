@@ -16,12 +16,12 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ChatCommunication;
 
-namespace ChatClient
+namespace ChatClient.Views
 {
     /// <summary>
     /// Interaction logic for LoginView.xaml
     /// </summary>
-    public partial class LoginView : Window
+    public partial class LoginView : UserControl
     {
         public LoginView()
         {

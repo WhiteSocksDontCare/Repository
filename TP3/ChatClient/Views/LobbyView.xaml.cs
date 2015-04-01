@@ -12,12 +12,12 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace ChatClient
+namespace ChatClient.Views
 {
     /// <summary>
     /// Logique d'interaction pour LobbyView.xaml
     /// </summary>
-    public partial class LobbyView : Window
+    public partial class LobbyView : UserControl
     {
         public LobbyView()
         {

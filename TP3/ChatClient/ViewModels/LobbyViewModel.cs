@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ChatClient
+namespace ChatClient.ViewModels
 {
     class LobbyViewModel : BindableBase
     {

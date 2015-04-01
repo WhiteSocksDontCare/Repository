@@ -5,10 +5,22 @@
              xmlns:Views="clr-namespace:ChatClient.Views"
              StartupUri="Views/MainWindow.xaml">
     <Application.Resources>
-        
+
+        <DataTemplate DataType="{x:Type ViewModels:ProfileViewModel}">
+            <Views:ProfileView />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type ViewModels:LobbyViewModel}">
+            <Views:LobbyView />
+        </DataTemplate>
+
+        <!--<DataTemplate DataType="{x:Type ViewModels:RoomViewModel}">
+            <Views:RoomView />
+        </DataTemplate>-->
+
         <DataTemplate DataType="{x:Type ViewModels:LoginViewModel}">
             <Views:LoginView />
         </DataTemplate>
-         
+
     </Application.Resources>
 </Application>
