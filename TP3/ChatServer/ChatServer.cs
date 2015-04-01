@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Text;
+using System.Timers;
 
 namespace ChatServer
 {
@@ -26,9 +27,52 @@ namespace ChatServer
 
     class ChatServer
     {
+        private static double SAVE_INTERVAL = 600000;  //Intervale de temps entre deux save des listes dans le fichier XML (10 minutes)
         private static int i = 0;
         public static ManualResetEvent AllDone = new ManualResetEvent(false);
-        private static Dictionary<string, Socket> clients = new Dictionary<string,Socket>();
+        private static Dictionary<string, Socket> clients = new Dictionary<string, Socket>();
+
+        public static void LoadServerInfos()
+        {
+            //Test temporaire pour vérifier le fonctionnement des fichiers XML
+            try
+            {
+                ChatCommunication.User test = ChatCommunication.SerializerHelper.DeserializeFromXML<ChatCommunication.User>("test.xml");
+                //Console.Out.WriteLine("Deserialized : Pseudo(" + test.Pseudo + ") Password(" + test.Password + ")");
+            }
+            catch(Exception ex)
+            {
+                Console.Out.WriteLine(ex.InnerException.Message);
+            }
+        }
+        public static void ServerInfosTimer()
+        {
+            System.Timers.Timer saveTimer = new System.Timers.Timer(SAVE_INTERVAL);
+
+            saveTimer.AutoReset = true;
+            saveTimer.Elapsed += new ElapsedEventHandler(SaveServerInfos);
+
+            saveTimer.Start();
+        }
+
+        public static void SaveServerInfos(object source, ElapsedEventArgs e)
+        {
+            //Test temporaire pour vérifier le fonctionnement des fichiers XML
+            try
+            {
+                ChatCommunication.User test = new ChatCommunication.User();
+                DateTime date = DateTime.Now;
+                test.Pseudo = date.ToLongDateString();
+                test.Password = date.ToLongTimeString();
+                //Console.Out.WriteLine("Serialized : Pseudo(" + test.Pseudo + ") Password(" + test.Password + ")");
+
+                ChatCommunication.SerializerHelper.SerializeToXML(test, "test.xml");
+            }
+            catch (Exception ex)
+            {
+                Console.Out.WriteLine(ex.InnerException.Message);
+            }
+        }
 
         public static void StartListening()
         {
