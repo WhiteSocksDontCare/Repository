@@ -42,7 +42,7 @@ namespace ChatClient
                 client.BeginConnect(remoteEP, ConnectCallback, client);
                 connectDone.WaitOne(); 
 
-                Send(client, Type.Login, name);
+                Send(client, "Login", name);
                 sendDone.WaitOne();
 
                 Receive(client);
@@ -122,9 +122,9 @@ namespace ChatClient
             }
         }
 
-        private static void Send(Socket client, Type commandType, String data)
+        private static void Send(Socket client, string commandType, string data)
         {
-            data = (int)commandType + data;
+            data = commandType + "!"+ data;
             var byteData = Encoding.ASCII.GetBytes(data);
 
             client.BeginSend(byteData, 0, byteData.Length, 0, SendCallback, client);

@@ -86,15 +86,11 @@ namespace ChatServer
 
             if (bytesRead <= 0) return;
 
-            var commandType = (Type)Int32.Parse(Encoding.ASCII.GetString(state.Buffer, 0, 1));
-            var message = Encoding.ASCII.GetString(state.Buffer, 1, bytesRead-1);
+            var message = Encoding.ASCII.GetString(state.Buffer, 0, bytesRead);
 
-            if (commandType == Type.Login)
-            {
-                Console.WriteLine("login");
-                clients[message] = handler;
-                Send(clients[message], "salut");
-            }
+            Console.WriteLine("login" + message);
+            clients[message] = handler;
+            Send(clients[message], "salut");
             
         }
 

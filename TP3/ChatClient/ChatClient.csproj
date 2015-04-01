@@ -62,7 +62,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Client.cs" />
-    <Compile Include="Enum.cs" />
     <Compile Include="Login.xaml.cs">
       <DependentUpon>Login.xaml</DependentUpon>
       <SubType>Code</SubType>
