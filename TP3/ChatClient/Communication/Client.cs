@@ -30,6 +30,7 @@ namespace ChatClient
         private static readonly ManualResetEvent receiveDone = new ManualResetEvent(false);
 
         private static String response = String.Empty;
+        private static Socket client;
 
         public static bool StartClient(User user)
         {
@@ -39,15 +40,15 @@ namespace ChatClient
                 var ipAddress = ipHostInfo.AddressList[1];
                 var remoteEP = new IPEndPoint(ipAddress, port);
 
-                var client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
                 client.BeginConnect(remoteEP, ConnectCallback, client);
                 connectDone.WaitOne(); 
 
-                Send(client, "Login", user.Serialize());
+                Send("Login", user.Serialize());
                 sendDone.WaitOne();
 
-                Receive(client);
+                Receive();
                 receiveDone.WaitOne();
                 
                 Console.WriteLine(@"Response received : {0}", response);
@@ -82,7 +83,7 @@ namespace ChatClient
             }
         }
 
-        private static void Receive(Socket client)
+        private static void Receive()
         {
             try
             {
@@ -164,7 +165,7 @@ namespace ChatClient
             //}
         }
 
-        private static void Send(Socket client, string commandType, string data)
+        private static void Send(string commandType, string data)
         {
             data = commandType + "!"+ data;
             var byteData = Encoding.ASCII.GetBytes(data);
