@@ -33,12 +33,17 @@ namespace ChatServer
         private static List<Room> rooms = new List<Room>();
         private static List<Like> likes = new List<Like>();
         private static List<User> users = new List<User>();
+        private static List<Message> messages = new List<Message>();
+        private static int messageID = 0;
+        private static Lobby lobby = new Lobby();
 
         public static void StartListening()
         {
             var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
             var ipAddress = ipHostInfo.AddressList[1];
             var localEndPoint = new IPEndPoint(ipAddress, 11000);
+
+            messageID = messages.Count;
 
             var listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
@@ -112,37 +117,39 @@ namespace ChatServer
                         Logout(handler);
                         break;
                     }
-
                 case "CreateProfile":
-                {
-                    CreateProfile(messageArray[1].Deserialize<Profile>());
+                    {
+                        var profile = messageArray[1].Deserialize<Profile>();
+                        CreateProfile(profile);
+                        UpdateLobby(handler, profile);
                         break;
                     }
                 case "EditProfile":
-                {
-                    EditProfile(handler, messageArray[1].Deserialize<Profile>());
+                    {
+                        EditProfile(handler, messageArray[1].Deserialize<Profile>());
                         break;
                     }
                 case "ViewProfile":
-                {
-                    ViewProfile(handler, messageArray[1]);
-                        
+                    {
+                        ViewProfile(handler, messageArray[1]);
+
                         break;
                     }
                 case "CreateRoom":
-                {
-                    CreateRoom(handler, messageArray[1].Deserialize<Room>());
-                        
+                    {
+                        CreateRoom(handler, messageArray[1].Deserialize<Room>());
+
                         break;
                     }
                 case "JoinRoom":
-                {
-                    JoinRoom(handler, Convert.ToInt32(messageArray[1]));
+                    {
+                        JoinRoom(handler, Convert.ToInt32(messageArray[1]));
                         break;
                     }
                 case "LeaveRoom":
-                {
-                    LeaveRoom(handler);
+                    {
+                        LeaveRoom(handler, Convert.ToInt32(messageArray[1]));
+                        UpdateLobby(handler, onlineClients[handler]);
                         break;
                     }
                 case "SendMessage":
@@ -156,8 +163,8 @@ namespace ChatServer
                         break;
                     }
                 case "SendLike":
-                {
-                    SendLike(messageArray[1].Deserialize<Like>());
+                    {
+                        SendLike(messageArray[1].Deserialize<Like>());
                         break;
                     }
                 default:
@@ -196,19 +203,19 @@ namespace ChatServer
         /// Verifie les credentials dans la liste des user, si trouve on ajoute le profile aux onlineClients,
         /// Sinon on retourne un message d'erreur
         /// </summary>
-        /// <param name="handler"></param>
+        /// <param name="socket"></param>
         /// <param name="user"></param>
-        private static void TryConnect(Socket handler, User user)
+        private static void TryConnect(Socket socket, User user)
         {
             if (users.Find(x => x.Pseudo == user.Pseudo && x.Password == user.Password) == null)
             {
-                Send(handler, "Error", "Nom d'usager ou mot de passe invalide");
+                Send(socket, "Error", "Nom d'usager ou mot de passe invalide");
                 return;
             }
 
             var profile = profiles.Find(x => x.Pseudo == user.Pseudo);
-            onlineClients[handler] = profile;
-
+            onlineClients[socket] = profile;
+            UpdateLobby(socket, profile);
         }
 
         /// <summary>
@@ -228,10 +235,10 @@ namespace ChatServer
         /// <summary>
         /// Enleve le tuple du dictionaire en fonction du socket
         /// </summary>
-        /// <param name="handler"></param>
-        private static void Logout(Socket handler)
+        /// <param name="socket"></param>
+        private static void Logout(Socket socket)
         {
-            onlineClients.Remove(handler);
+            onlineClients.Remove(socket);
         }
 
         /// <summary>
@@ -296,9 +303,16 @@ namespace ChatServer
         /// Met à jour le id de la salle du profil à -1
         /// </summary>
         /// <param name="handler"></param>
-        private static void LeaveRoom(Socket handler)
+        /// <param name="idRoom"></param>
+        private static void LeaveRoom(Socket handler, int idRoom)
         {
+            var room = rooms.Find(x => x.IDRoom == idRoom);
+            room.SubscribedUsers.Remove(onlineClients[handler]);
+            if (room.SubscribedUsers.Count <= 0)
+                room.IsDeleted = true;
+
             onlineClients[handler].IDRoom = -1;
+
             //Send();
         }
 
@@ -309,15 +323,13 @@ namespace ChatServer
         /// <param name="message"></param>
         public static void SendMessage(Message message)
         {
+            message.IDMessage = messageID++;
+            // Ajoute à la liste de message du serveur
+            messages.Add(message);
             var room = rooms.Find(x => x.IDRoom == message.IDRoom);
-            List<Socket> listSockets = onlineClients.Where(x => room.SubscribedUsers.All(p => p == x.Value)).Select(x => x.Key).ToList();
-
+            // Ajoute à la liste de message
             room.Messages.Add(message);
-
-            foreach (var socket in listSockets)
-            {
-                Send(socket, "UpdateRoom", room.Serialize());
-            }
+            UpdateRoom(room);
         }
 
         /// <summary>
@@ -327,10 +339,44 @@ namespace ChatServer
         /// <param name="message"></param>
         public static void DeleteMessage(Message message)
         {
+            var message1 = messages.Find(x => x.Pseudo == message.Pseudo);
+            message1.IsDeleted = true;
             var room = rooms.Find(x => x.IDRoom == message.IDRoom);
-            List<Socket> listSockets = onlineClients.Where(x => room.SubscribedUsers.All(p => p == x.Value)).Select(x => x.Key).ToList();
+            var message2 = room.Messages.Find(x => x.Pseudo == message.Pseudo);
+            message2.IsDeleted = true;
+            UpdateRoom(room);
+        }
 
-            room.Messages.Remove(message);
+        /// <summary>
+        /// Ajoute le like à la liste
+        /// </summary>
+        /// <param name="like"></param>
+        private static void SendLike(Like like)
+        {
+            likes.Add(like);
+        }
+
+        /// <summary>
+        /// Calcul le nombre de like pour chaque message et envoie ensuite la
+        /// salle à tous les clients via leur socket
+        /// </summary>
+        /// <param name="room"></param>
+        private static void UpdateRoom(Room room)
+        {
+            // Update nblike for each message
+            foreach (var message in room.Messages)
+            {
+                if (room.IDRoom != message.IDRoom) continue;
+                foreach (var like in likes.Where(like => like.IDMessage == message.IDMessage))
+                {
+                    if (like.IsLike)
+                        message.NbLike++;
+                    else
+                        message.NbDislike++;
+                }
+            }
+
+            List<Socket> listSockets = onlineClients.Where(x => room.SubscribedUsers.All(p => p == x.Value)).Select(x => x.Key).ToList();
 
             foreach (var socket in listSockets)
             {
@@ -338,10 +384,12 @@ namespace ChatServer
             }
         }
 
-        private static void SendLike(Like like)
+        private static void UpdateLobby(Socket socket, Profile profile)
         {
-            likes.Add(like);
+            lobby.AllRooms = rooms;
+            lobby.ClientProfile = profile;
+            lobby.OtherUsers = onlineClients.Where(x => x.Value != profile).Select(y => y.Value).ToList();
+            Send(socket, "UpdateLobby", lobby.Serialize());
         }
-
     }
 }
