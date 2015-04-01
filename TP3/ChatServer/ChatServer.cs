@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Text;
+using ChatCommunication;
 
 namespace ChatServer
 {
@@ -26,9 +26,13 @@ namespace ChatServer
 
     class ChatServer
     {
-        private static int i = 0;
         public static ManualResetEvent AllDone = new ManualResetEvent(false);
-        private static Dictionary<string, Socket> clients = new Dictionary<string,Socket>();
+
+        private static Dictionary<Socket, Profile> onlineClients = new Dictionary<Socket, Profile>();
+        private static List<Profile> profiles = new List<Profile>();
+        private static List<Room> rooms = new List<Room>();
+        private static List<Like> likes = new List<Like>();
+        private static List<User> users = new List<User>();
 
         public static void StartListening()
         {
@@ -47,7 +51,7 @@ namespace ChatServer
                 {
                     AllDone.Reset();
 
-                    Console.WriteLine("Waiting for someone..." + i++);
+                    Console.WriteLine("Waiting for someone...");
                     listener.BeginAccept(AcceptCallback, listener);
                     AllDone.WaitOne();
                 }
@@ -68,7 +72,7 @@ namespace ChatServer
             var listener = (Socket)ar.AsyncState;
             var handler = listener.EndAccept(ar);
 
-            var state = new StateObject {WorkSocket = handler};
+            var state = new StateObject { WorkSocket = handler };
 
             handler.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
                 ReadCallback, state);
@@ -78,7 +82,7 @@ namespace ChatServer
         {
             // Retrieve the state object and the handler socket
             // from the asynchronous state object.
-            var state = (StateObject) ar.AsyncState;
+            var state = (StateObject)ar.AsyncState;
             var handler = state.WorkSocket;
 
             // Read data from the client socket. 
@@ -86,28 +90,95 @@ namespace ChatServer
 
             if (bytesRead <= 0) return;
 
-            var message = Encoding.ASCII.GetString(state.Buffer, 0, bytesRead);
+            var data = Encoding.ASCII.GetString(state.Buffer, 0, bytesRead);
 
-            var messageArray = message.Split(new char[] {'!'}, 2);
+            var messageArray = data.Split(new[] { '!' }, 2);
             var commandType = messageArray[0];
+
+            switch (commandType)
+            {
+                case "Login":
+                    {
+                        TryConnect(handler, messageArray[1].Deserialize<User>());
+                        break;
+                    }
+                case "Subscribe":
+                    {
+                        Subscribe(handler, messageArray[1].Deserialize<User>());
+                        break;
+                    }
+                case "Logout":
+                    {
+                        Logout(handler);
+                        break;
+                    }
+
+                case "CreateProfile":
+                {
+                    CreateProfile(messageArray[1].Deserialize<Profile>());
+                        break;
+                    }
+                case "EditProfile":
+                {
+                    EditProfile(handler, messageArray[1].Deserialize<Profile>());
+                        break;
+                    }
+                case "ViewProfile":
+                {
+                    ViewProfile(handler, messageArray[1]);
+                        
+                        break;
+                    }
+                case "CreateRoom":
+                {
+                    CreateRoom(handler, messageArray[1].Deserialize<Room>());
+                        
+                        break;
+                    }
+                case "JoinRoom":
+                {
+                    JoinRoom(handler, Convert.ToInt32(messageArray[1]));
+                        break;
+                    }
+                case "LeaveRoom":
+                {
+                    LeaveRoom(handler);
+                        break;
+                    }
+                case "SendMessage":
+                    {
+                        SendMessage(messageArray[1].Deserialize<Message>());
+                        break;
+                    }
+                case "DeleteMessage":
+                    {
+                        DeleteMessage(messageArray[1].Deserialize<Message>());
+                        break;
+                    }
+                case "SendLike":
+                {
+                    SendLike(messageArray[1].Deserialize<Like>());
+                        break;
+                    }
+                default:
+                    throw new Exception();
+            }
             Console.WriteLine(commandType);
-            clients[message] = handler;
-            Send(clients[message], "salut");
-            
         }
 
-        public static void Send(Socket handler, String data)
+        public static void Send(Socket handler, string commandType, string data)
         {
-            byte[] byteData = Encoding.ASCII.GetBytes(data);
+            data = commandType + "!" + data;
+            var byteData = Encoding.ASCII.GetBytes(data);
 
-            handler.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(SendCallback), handler);
+            handler.BeginSend(byteData, 0, byteData.Length, 0, SendCallback, handler);
         }
 
         public static void SendCallback(IAsyncResult ar)
         {
             try
             {
-                var handler = (Socket) ar.AsyncState;
+                var handler = (Socket)ar.AsyncState;
 
                 int bytesSent = handler.EndSend(ar);
                 Console.WriteLine("Sent {0} bytes to client.", bytesSent);
@@ -120,5 +191,157 @@ namespace ChatServer
                 Console.WriteLine(e.ToString());
             }
         }
+
+        /// <summary>
+        /// Verifie les credentials dans la liste des user, si trouve on ajoute le profile aux onlineClients,
+        /// Sinon on retourne un message d'erreur
+        /// </summary>
+        /// <param name="handler"></param>
+        /// <param name="user"></param>
+        private static void TryConnect(Socket handler, User user)
+        {
+            if (users.Find(x => x.Pseudo == user.Pseudo && x.Password == user.Password) == null)
+            {
+                Send(handler, "Error", "Nom d'usager ou mot de passe invalide");
+                return;
+            }
+
+            var profile = profiles.Find(x => x.Pseudo == user.Pseudo);
+            onlineClients[handler] = profile;
+
+        }
+
+        /// <summary>
+        /// Créer un profile vide en remplissant juste le Pseudo, ajoute le user à la liste et retourne le profil
+        /// au client pour qu'il puisse le compléter
+        /// </summary>
+        /// <param name="handler"></param>
+        /// <param name="user"></param>
+        private static void Subscribe(Socket handler, User user)
+        {
+            var bidon = new Profile { Pseudo = user.Pseudo };
+            onlineClients[handler] = bidon;
+            users.Add(user);
+            Send(handler, "Subscribe", bidon.Serialize());
+        }
+
+        /// <summary>
+        /// Enleve le tuple du dictionaire en fonction du socket
+        /// </summary>
+        /// <param name="handler"></param>
+        private static void Logout(Socket handler)
+        {
+            onlineClients.Remove(handler);
+        }
+
+        /// <summary>
+        /// Ajoute le profile passé en paramètre à la liste profiles
+        /// </summary>
+        /// <param name="profile"></param>
+        private static void CreateProfile(Profile profile)
+        {
+            profiles.Add(profile);
+        }
+
+        /// <summary>
+        /// Trouve le profil correspondant au nom du nouveau profil dans la liste de profil
+        /// et affecte le profil modifié
+        /// </summary>
+        /// <param name="socket"></param>
+        /// <param name="newProfile"></param>
+        private static void EditProfile(Socket socket, Profile newProfile)
+        {
+            var profile = profiles.Find(x => x.Pseudo == newProfile.Pseudo);
+            profiles[profiles.IndexOf(profile)] = newProfile;
+            Send(socket, "Info", "Le profile a été mis à jour");
+        }
+
+        /// <summary>
+        /// Trouve le profile correspondant au nom d'usager et le retourne au client
+        /// </summary>
+        /// <param name="socket"></param>
+        /// <param name="username"></param>
+        private static void ViewProfile(Socket socket, string username)
+        {
+            var profile = profiles.Find(x => x.Pseudo == username);
+            var serializedProfile = profile.Serialize();
+            Send(socket, "ViewProfile", serializedProfile);
+        }
+
+        /// <summary>
+        /// Ajoute la salle à la liste et retourne la salle
+        /// </summary>
+        /// <param name="handler"></param>
+        /// <param name="room"></param>
+        private static void CreateRoom(Socket handler, Room room)
+        {
+            rooms.Add(room);
+            Send(handler, "UpdateRoom", room.Serialize());
+        }
+
+        /// <summary>
+        /// Met à jour le id de la salle du profil de l'utilisateur
+        /// </summary>
+        /// <param name="socket"></param>
+        /// <param name="idRoom"></param>
+        private static void JoinRoom(Socket socket, int idRoom)
+        {
+            onlineClients[socket].IDRoom = idRoom;
+            var room = rooms.Find(x => x.IDRoom == idRoom);
+            room.SubscribedUsers.Add(onlineClients[socket]);
+            Send(socket, "UpdateRoom", room.Serialize());
+        }
+
+        /// <summary>
+        /// Met à jour le id de la salle du profil à -1
+        /// </summary>
+        /// <param name="handler"></param>
+        private static void LeaveRoom(Socket handler)
+        {
+            onlineClients[handler].IDRoom = -1;
+            //Send();
+        }
+
+        /// <summary>
+        /// Trouve les profils reliés au id de la salle de discussion. Trouve ensuite les socket reliés à chaque profil
+        /// dans le dictionnaire onlineClients. Envoie finalement la salle à tous les sockets trouvés.
+        /// </summary>
+        /// <param name="message"></param>
+        public static void SendMessage(Message message)
+        {
+            var room = rooms.Find(x => x.IDRoom == message.IDRoom);
+            List<Socket> listSockets = onlineClients.Where(x => room.SubscribedUsers.All(p => p == x.Value)).Select(x => x.Key).ToList();
+
+            room.Messages.Add(message);
+
+            foreach (var socket in listSockets)
+            {
+                Send(socket, "UpdateRoom", room.Serialize());
+            }
+        }
+
+        /// <summary>
+        /// Trouve les profils reliés au id de la salle de discussion. Trouve ensuite les socket reliés à chaque profil
+        /// dans le dictionnaire onlineClients. Envoie finalement la salle à tous les sockets trouvés.
+        /// </summary>
+        /// <param name="message"></param>
+        public static void DeleteMessage(Message message)
+        {
+            var room = rooms.Find(x => x.IDRoom == message.IDRoom);
+            List<Socket> listSockets = onlineClients.Where(x => room.SubscribedUsers.All(p => p == x.Value)).Select(x => x.Key).ToList();
+
+            room.Messages.Remove(message);
+
+            foreach (var socket in listSockets)
+            {
+                Send(socket, "UpdateRoom", room.Serialize());
+            }
+        }
+
+        private static void SendLike(Like like)
+        {
+            likes.Add(like);
+        }
+
     }
 }
