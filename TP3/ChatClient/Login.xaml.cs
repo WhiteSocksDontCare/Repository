@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ChatCommunication;
 
 namespace ChatClient
 {
@@ -25,6 +26,8 @@ namespace ChatClient
         public MainWindow()
         {
             InitializeComponent();
+            User u = new User();
+            
         }
 
         private void BTN_Connect_Click(object sender, RoutedEventArgs e)
