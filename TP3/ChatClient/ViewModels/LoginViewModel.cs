@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ChatCommunication;
+using System.Windows.Controls;
 
 namespace ChatClient.ViewModels
 {
@@ -23,10 +24,15 @@ namespace ChatClient.ViewModels
 
         public ICommand LoginCommand { get; private set; }
         public ICommand SubscribeCommand { get; private set; }
+        public User User
+        {
+            get { return this.user; }
+            set { SetProperty(ref this.user, value); }
+        }
 
         private void Login(object password)
         {
-            user.Password = Encode_Pass((string)password);
+            user.Password = Encode_Pass(((PasswordBox)password).Password);
             if(Client.StartClient(user))
             {
                 //move to lobby
@@ -35,7 +41,7 @@ namespace ChatClient.ViewModels
 
         private void Subscribe(object password)
         {
-            user.Password = Encode_Pass((string)password);
+            user.Password = Encode_Pass(((PasswordBox)password).Password);
             if (Client.StartClient(user))
             {
                 //move to profil creation
