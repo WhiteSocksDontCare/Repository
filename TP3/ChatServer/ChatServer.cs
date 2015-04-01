@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Text;
 using ChatCommunication;
+using System.Timers;
 
 namespace ChatServer
 {
@@ -26,9 +27,16 @@ namespace ChatServer
 
     class ChatServer
     {
-        public static ManualResetEvent AllDone = new ManualResetEvent(false);
+        private static double SAVE_INTERVAL = 600000;  //Intervale de temps entre deux save des listes dans le fichier XML (10 minutes)
+        private static string PROFILES_FILE = "profiles.xml";
+        private static string ROOMS_FILE = "rooms.xml";
+        private static string LIKES_FILE = "likes.xml";
+        private static string USERS_FILE = "users.xml";
 
+        private static int i = 0;
+        public static ManualResetEvent AllDone = new ManualResetEvent(false);
         private static Dictionary<Socket, Profile> onlineClients = new Dictionary<Socket, Profile>();
+
         private static List<Profile> profiles = new List<Profile>();
         private static List<Room> rooms = new List<Room>();
         private static List<Like> likes = new List<Like>();
@@ -36,6 +44,42 @@ namespace ChatServer
         private static List<Message> messages = new List<Message>();
         private static int messageID = 0;
         private static Lobby lobby = new Lobby();
+
+        public static void LoadServerInfos()
+        {
+            List<Profile> tempProfiles;
+            if ((tempProfiles = ChatCommunication.SerializerHelper.DeserializeFromXML<List<Profile>>(PROFILES_FILE)) != null)
+                profiles = tempProfiles;
+
+            List<Room> tempRooms;
+            if ((tempRooms = ChatCommunication.SerializerHelper.DeserializeFromXML<List<Room>>(ROOMS_FILE)) != null)
+                rooms = tempRooms;
+
+            List<Like> tempLikes;
+            if ((tempLikes = ChatCommunication.SerializerHelper.DeserializeFromXML<List<Like>>(LIKES_FILE)) != null)
+                likes = tempLikes;
+
+            List<User> tempUsers;
+            if ((tempUsers = ChatCommunication.SerializerHelper.DeserializeFromXML<List<User>>(USERS_FILE)) != null)
+                users = tempUsers;
+        }
+        public static void ServerInfosTimer()
+        {
+            System.Timers.Timer saveTimer = new System.Timers.Timer(SAVE_INTERVAL);
+
+            saveTimer.AutoReset = true;
+            saveTimer.Elapsed += new ElapsedEventHandler(SaveServerInfos);
+
+            saveTimer.Start();
+        }
+
+        public static void SaveServerInfos(object source, ElapsedEventArgs e)
+        {
+            ChatCommunication.SerializerHelper.SerializeToXML(profiles, PROFILES_FILE);
+            ChatCommunication.SerializerHelper.SerializeToXML(rooms, ROOMS_FILE);
+            ChatCommunication.SerializerHelper.SerializeToXML(likes, LIKES_FILE);
+            ChatCommunication.SerializerHelper.SerializeToXML(users, USERS_FILE);
+        }
 
         public static void StartListening()
         {
