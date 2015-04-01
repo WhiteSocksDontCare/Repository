@@ -32,7 +32,7 @@ namespace ChatClient
 
         private void BTN_Connect_Click(object sender, RoutedEventArgs e)
         {
-            if (!Client.StartClient(TB_Username.Text))
+            if (!Client.StartClient(TB_Username_Login.Text))
             {
                 LB_Response.Content = "Mauvais username";
             }
