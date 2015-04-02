@@ -270,14 +270,15 @@ namespace ChatServer
         /// Créer un profile vide en remplissant juste le Pseudo, ajoute le user à la liste et retourne le profil
         /// au client pour qu'il puisse le compléter
         /// </summary>
-        /// <param name="handler"></param>
+        /// <param name="handlersocket"></param>
         /// <param name="user"></param>
-        private static void Subscribe(Socket handler, User user)
+        private static void Subscribe(Socket socket, User user)
         {
             var bidon = new Profile { Pseudo = user.Pseudo, IDRoom = -1 };
-            onlineClients[handler] = bidon;
+            onlineClients[socket] = bidon;
             users.Add(user);
-            Send(handler, "Subscribe", bidon.Serialize());
+            UpdateLobby(socket, bidon);
+            //Send(handler, "UpdateLobby", bidon.Serialize());
         }
 
         /// <summary>
