@@ -3,10 +3,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:ChatClient.Converters"
              mc:Ignorable="d"
              x:Name="UserControl"
              d:DesignWidth="640"
              d:DesignHeight="550">
+    <UserControl.Resources>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></converters:BooleanToVisibilityConverter>
+    </UserControl.Resources>
 
     <Grid HorizontalAlignment="Left"
           Height="537"
@@ -25,6 +29,7 @@
                   Width="143" />
 
         <Button Content="Quitter salle"
+                Visibility="{Binding IsInRoom, Converter={StaticResource BooleanToVisibilityConverter}}"
                 Command="{Binding LeaveRoomCommand}"
                 HorizontalAlignment="Left"
                 Margin="521,113,0,0"
@@ -39,6 +44,7 @@
                 Width="93"
                 Height="31" />
         <TextBox HorizontalAlignment="Left"
+                 Visibility="{Binding IsInRoom, Converter={StaticResource BooleanToVisibilityConverter}}"
                  Height="49"
                  Margin="199,428,0,0"
                  TextWrapping="Wrap"
@@ -46,6 +52,7 @@
                  VerticalAlignment="Top"
                  Width="266" />
         <TextBox HorizontalAlignment="Left"
+                 Visibility="{Binding IsInRoom, Converter={StaticResource BooleanToVisibilityConverter}}"
                  Height="252"
                  Margin="199,159,0,0"
                  TextWrapping="Wrap"
@@ -53,6 +60,7 @@
                  VerticalAlignment="Top"
                  Width="266" />
         <Button Content="Envoyer"
+                Visibility="{Binding IsInRoom, Converter={StaticResource BooleanToVisibilityConverter}}"
                 Command="{Binding SendMessageCommand}"
                 HorizontalAlignment="Left"
                 Margin="482,428,0,0"
@@ -60,6 +68,7 @@
                 Width="135"
                 Height="49" />
         <ListView HorizontalAlignment="Left"
+                  Visibility="{Binding IsInRoom, Converter={StaticResource BooleanToVisibilityConverter}}"
                   Margin="474,159,0,0"
                   VerticalAlignment="Top"
                   Height="252"

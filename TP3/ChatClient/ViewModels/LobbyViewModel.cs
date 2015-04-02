@@ -14,6 +14,15 @@ namespace ChatClient.ViewModels
 {
     class LobbyViewModel : BindableBase
     {
+        private bool _isInRoom;
+        private List<User> _users;
+        private List<Room> _rooms; 
+ 
+        public bool IsInRoom
+        {
+            get { return _isInRoom; }
+            set { SetProperty(ref _isInRoom, value); }
+        }
         public ICommand DisconnectCommand { get; private set; }
         public ICommand EditProfileCommand { get; private set; }
         public ICommand LeaveRoomCommand { get; private set; }

@@ -79,6 +79,7 @@
     <Compile Include="Container\Container.cs" />
     <Compile Include="Container\IContainer.cs" />
     <Compile Include="Container\MicrokernelContainer.cs" />
+    <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
