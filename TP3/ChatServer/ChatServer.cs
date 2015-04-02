@@ -27,11 +27,14 @@ namespace ChatServer
 
     class ChatServer
     {
+        private static double UPDATE_INTERVAL = 30000;  //Intervale de temps entre deux mises à jour des lobbys vers les clients (30 secondes)
         private static double SAVE_INTERVAL = 600000;  //Intervale de temps entre deux save des listes dans le fichier XML (10 minutes)
         private static string PROFILES_FILE = "profiles.xml";
         private static string ROOMS_FILE = "rooms.xml";
         private static string LIKES_FILE = "likes.xml";
         private static string USERS_FILE = "users.xml";
+
+        private static Semaphore semaphoreLobby = new Semaphore(1, 1);
 
         private static int i = 0;
         public static ManualResetEvent AllDone = new ManualResetEvent(false);
@@ -68,17 +71,34 @@ namespace ChatServer
             System.Timers.Timer saveTimer = new System.Timers.Timer(SAVE_INTERVAL);
 
             saveTimer.AutoReset = true;
-            saveTimer.Elapsed += new ElapsedEventHandler(SaveServerInfos);
+            saveTimer.Elapsed += new ElapsedEventHandler(ServerInfosTimerElapsed);
 
             saveTimer.Start();
         }
 
-        public static void SaveServerInfos(object source, ElapsedEventArgs e)
+        public static void ServerInfosTimerElapsed(object source, ElapsedEventArgs e)
         {
+            //TODO : Décider si un sémaphore nécessaire (dangereux de sérializer si autre thread ajoute dans une liste?)
             ChatCommunication.SerializerHelper.SerializeToXML(profiles, PROFILES_FILE);
             ChatCommunication.SerializerHelper.SerializeToXML(rooms, ROOMS_FILE);
             ChatCommunication.SerializerHelper.SerializeToXML(likes, LIKES_FILE);
             ChatCommunication.SerializerHelper.SerializeToXML(users, USERS_FILE);
+        }
+
+        public static void UpdateLobbyTimer()
+        {
+            System.Timers.Timer updateTimer = new System.Timers.Timer(UPDATE_INTERVAL);
+
+            updateTimer.AutoReset = true;
+            updateTimer.Elapsed += new ElapsedEventHandler(UpdateLobbyTimerElapsed);
+
+            updateTimer.Start();
+        }
+
+        public static void UpdateLobbyTimerElapsed(object source, ElapsedEventArgs e)
+        {
+            foreach(KeyValuePair<Socket, Profile> client in onlineClients)
+                UpdateLobby(client.Key, client.Value);
         }
 
         public static void StartListening()
@@ -435,10 +455,12 @@ namespace ChatServer
 
         private static void UpdateLobby(Socket socket, Profile profile)
         {
+            semaphoreLobby.WaitOne();
             lobby.AllRooms = rooms;
             lobby.ClientProfile = profile;
             lobby.OtherUsers = onlineClients.Where(x => x.Value != profile).Select(y => y.Value).ToList();
             Send(socket, "UpdateLobby", lobby.Serialize());
+            semaphoreLobby.Release();
         }
     }
 }
