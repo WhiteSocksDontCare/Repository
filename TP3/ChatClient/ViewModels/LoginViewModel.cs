@@ -9,6 +9,7 @@ using System.Windows.Input;
 using ChatCommunication;
 using System.Windows.Controls;
 using MVVM.Container;
+using System.Diagnostics;
 
 namespace ChatClient.ViewModels
 {
@@ -40,13 +41,13 @@ namespace ChatClient.ViewModels
 
             //user.Password = Encode_Pass(((PasswordBox)password).Password);
             user.Password = ((PasswordBox)password).Password;
-            Profile profile = Client.LogClient(user);
 
-            if(profile != null)
+            if (Client.LogClient(user))
             {
-                //move to lobby
+                //reponse positive, on a pas recu Error! => On est logger
                 Container.GetA<MainViewModel>().NavigateToView(Container.GetA<LobbyViewModel>());
             }
+
         }
 
         private void Subscribe(object password)
@@ -58,11 +59,12 @@ namespace ChatClient.ViewModels
 
             //user.Password = Encode_Pass(((PasswordBox)password).Password);
             user.Password = ((PasswordBox)password).Password;
-            Profile profile = Client.SubClient(user);
-            
-            if (profile != null)
+
+            if (Client.SubClient(user))
             {
-                //move to profil creation
+                //move to profil creation and set the profile from lobby information
+                Container.GetA<EditProfileViewModel>().Profile = Container.GetA<LobbyViewModel>().Lobby.ClientProfile;
+                Container.GetA<MainViewModel>().NavigateToView(Container.GetA<EditProfileViewModel>());
             }
 
         }

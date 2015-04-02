@@ -9,9 +9,9 @@
         <DataTemplate DataType="{x:Type ViewModels:ProfileViewModel}">
             <Views:ProfileView />
         </DataTemplate>
-        
-        <DataTemplate DataType="{x:Type ViewModels:MainViewModel}">
-            <Views:MainView />
+
+        <DataTemplate DataType="{x:Type ViewModels:EditProfileViewModel}">
+            <Views:EditProfileView />
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type ViewModels:LobbyViewModel}">
@@ -22,10 +22,15 @@
             <Views:LoginView />
         </DataTemplate>
 
-        <!--<DataTemplate DataType="{x:Type ViewModels:RoomViewModel}">
-            <Views:RoomView />
-        </DataTemplate>-->
-
+        <DataTemplate DataType="{x:Type ViewModels:MainViewModel}">
+            <Views:MainView />
+        </DataTemplate>
+        
+        <!--
+        Ne pas Ajouter Room ici car il est inclus dans le lobby.
+        il faut ajouter toutes les "fenetres" ici.
+        il faut ajouter tout les viewModels dans le app.xaml.cs
+        -->
 
     </Application.Resources>
 </Application>

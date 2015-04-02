@@ -33,7 +33,7 @@ namespace ChatClient
         private static readonly ManualResetEvent sendDone = new ManualResetEvent(false);
         private static readonly ManualResetEvent receiveDone = new ManualResetEvent(false);
 
-        private static Object response;
+        private static bool response;
         private static Socket client = null;
 
         public static bool IsConnected()
@@ -65,7 +65,7 @@ namespace ChatClient
              }
              return false;
         }
-        public static Profile LogClient(User user)
+        public static bool LogClient(User user)
         {
             try
             {
@@ -75,16 +75,17 @@ namespace ChatClient
                 Receive();
                 receiveDone.WaitOne();
 
-                return (Profile)response;
+                return response;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
+                
             }
 
-            return null;
+            return false;
         }
-        public static Profile SubClient(User user)
+        public static bool SubClient(User user)
         {
             try
             {
@@ -94,14 +95,14 @@ namespace ChatClient
                 Receive();
                 receiveDone.WaitOne();
                 
-                return (Profile)response;
+                return response;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
             }
 
-            return null;
+            return false;
         }
 
         public static bool DisconnectClient()
@@ -167,16 +168,16 @@ namespace ChatClient
             var messageArray = message.Split(new char[] { '!' }, 2);
             var commandType = messageArray[0];
             Console.WriteLine(commandType);
+            response = true;
 
             switch (commandType)
             {
                 case "Info":
-                    response = null;
                     var messageInfo = messageArray[1];
                     MessageBox.Show(messageInfo, "Informations", MessageBoxButton.OK, MessageBoxImage.Information);
                     break;
                 case "Error":
-                    response = null;
+                    response = false;
                     var messageError = messageArray[1];
                     MessageBox.Show(messageError, "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
                     break;
