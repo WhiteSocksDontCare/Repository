@@ -84,7 +84,11 @@ namespace ChatServer
         public static void StartListening()
         {
             var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-            var ipAddress = ipHostInfo.AddressList[1];
+            IPAddress ipAddress = null;
+            foreach (var addr in Dns.GetHostEntry(string.Empty).AddressList.Where(addr => addr.AddressFamily == AddressFamily.InterNetwork))
+            {
+                ipAddress=addr;
+            }
             var localEndPoint = new IPEndPoint(ipAddress, 11000);
 
             messageID = messages.Count;
