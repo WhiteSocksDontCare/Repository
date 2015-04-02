@@ -7,6 +7,7 @@ using Microsoft.Practices.Prism.Mvvm;
 using System.Windows.Input;
 using Microsoft.Practices.Prism.Commands;
 using ChatCommunication;
+using MVVM.Container;
 
 namespace ChatClient.ViewModels
 {
@@ -26,6 +27,13 @@ namespace ChatClient.ViewModels
             get { return _room; }
             set { SetProperty(ref _room, value); }
         }
+
+        //Utile pour les élement d'une liste. car un message doit etre texte + like ou dislike
+        //public ObservableCollection<MessageViewModel> MessageViewModels
+        //{
+        //    get { return Container.GetA<MessageViewModel>(); }
+        //}
+
 
         public ICommand LeaveRoomCommand { get; private set; }
         public ICommand SendMessageCommand { get; private set; }
