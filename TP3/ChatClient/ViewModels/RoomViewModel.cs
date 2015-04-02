@@ -6,11 +6,20 @@ using System.Threading.Tasks;
 using Microsoft.Practices.Prism.Mvvm;
 using System.Windows.Input;
 using Microsoft.Practices.Prism.Commands;
+using ChatCommunication;
 
 namespace ChatClient.ViewModels
 {
     class RoomViewModel : BindableBase
     {
+
+        private Room _room;
+        public Room Room
+        {
+            get { return _room; }
+            set { SetProperty(ref _room, value); }
+        }
+
         RoomViewModel() 
         {
             LeaveRoomCommand = new DelegateCommand(LeaveRoom);

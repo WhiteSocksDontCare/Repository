@@ -15,10 +15,14 @@ namespace ChatClient.ViewModels
     class LobbyViewModel : BindableBase
     {
         private bool _isInRoom;
-        private Profile _profile;
-        private List<User> _users;
-        private List<Room> _rooms;
- 
+        private Lobby _lobby;
+
+        public Lobby Lobby
+        {
+            get { return _lobby; }
+            set { SetProperty(ref _lobby, value); }
+        }
+
         public RoomViewModel RoomViewModel
         {
             get { return Container.GetA<RoomViewModel>(); }

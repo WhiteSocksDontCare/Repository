@@ -7,6 +7,8 @@ using System.Windows.Controls.Primitives;
 using System.Xml.Serialization;
 using ChatCommunication;
 using System.Windows;
+using MVVM.Container;
+using ChatClient.ViewModels;
 
 namespace ChatClient
 {
@@ -173,21 +175,20 @@ namespace ChatClient
                     var messageError = messageArray[1];
                     MessageBox.Show(messageError, "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
                     break;
+                //UpdateLobby -> cas general. recu en tout temps; profil vide lors de la creation
                 case "UpdateLobby":
                     Lobby lobby = messageArray[1].Deserialize<Lobby>();
-                    // TODO : Mettre à jour le lobby.
+                    Container.GetA<LobbyViewModel>().Lobby = lobby;
                     break;
+                //UpdateRoom -> Recu seulement quand le client est dans une room
                 case "UpdateRoom":
                     Room room = messageArray[1].Deserialize<Room>();
-                    // TODO : Mettre à jour la room dans laquelle se trouve l'utilisateur.
+                    Container.GetA<RoomViewModel>().Room = room;
                     break;
+                //UpdateProfile -> recu dans le cas d'une consultation de profil (sois-meme ou autre)
                 case "UpdateProfile":
                     Profile profile = messageArray[1].Deserialize<Profile>();
                     // TODO : Afficher le profil reçu.
-                    break;
-                case "Subscribe":
-                    response = messageArray[1].Deserialize<Profile>();
-                    // TODO : Afficher le form pour qu'il crée son profile.
                     break;
                 default:
                     throw new Exception("Commande '" + commandType + "' non reconnue.");
