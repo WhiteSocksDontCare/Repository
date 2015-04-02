@@ -17,12 +17,6 @@ namespace ChatClient.ViewModels
             set { SetProperty(ref this._currentView, value); }
         }
 
-        //EXEMPLE DE COMMANDE DE NAVIGATION
-        //public ICommand NavigateToStocksCommand
-        //{
-        //    get { return new NavigateToViewCommand(Container.GetA<IStockQuotesViewModel>()); }
-        //}
-
         public void NavigateToView(object viewToNavigate)
         {
             CurrentView = viewToNavigate;

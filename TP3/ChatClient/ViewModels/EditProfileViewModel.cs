@@ -7,19 +7,20 @@ using ChatCommunication;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
 using System.Windows.Input;
+using MVVM.Container;
 
 namespace ChatClient.ViewModels
 {
     class EditProfileViewModel : BindableBase
     {
+        Profile _profile;
 
-        EditProfileViewModel()
+        public EditProfileViewModel()
         {
             SaveCommand = new DelegateCommand(SaveModification);
             CancelCommand = new DelegateCommand(CancelModification);
         }
 
-        Profile _profile;
         public Profile Profile
         {
             get { return _profile; }
@@ -32,13 +33,22 @@ namespace ChatClient.ViewModels
 
         public void SaveModification()
         {
-            //TODO: devrait recevoir un un update Lobby
-            //Ou setter LobbyViewModel.Lobby.Profile = this.Profile
+            bool succes = true;
+            if (succes)
+            {
+                Container.GetA<ProfileViewModel>().Profile = this.Profile;
+                Container.GetA<LobbyViewModel>().Lobby.ClientProfile = this.Profile;
+                Container.GetA<MainViewModel>().NavigateToView(Container.GetA<ProfileViewModel>());
+            }
         }
 
         public void CancelModification()
         {
-            //TODO: redemander un viewProfile pour 
+            bool succes = true;
+            if (succes)
+            {
+                Container.GetA<MainViewModel>().NavigateToView(Container.GetA<ProfileViewModel>());
+            }
         }
     }
 }

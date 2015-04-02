@@ -14,17 +14,19 @@ namespace ChatClient.ViewModels
     {
 
         private Room _room;
+
+        public RoomViewModel()
+        {
+            LeaveRoomCommand = new DelegateCommand(LeaveRoom);
+            SendMessageCommand = new DelegateCommand(SendMessage);
+        }
+
         public Room Room
         {
             get { return _room; }
             set { SetProperty(ref _room, value); }
         }
 
-        RoomViewModel() 
-        {
-            LeaveRoomCommand = new DelegateCommand(LeaveRoom);
-            SendMessageCommand = new DelegateCommand(SendMessage);
-        }
         public ICommand LeaveRoomCommand { get; private set; }
         public ICommand SendMessageCommand { get; private set; }
 

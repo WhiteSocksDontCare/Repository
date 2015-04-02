@@ -15,21 +15,21 @@ namespace ChatClient.ViewModels
 {
     class LoginViewModel : BindableBase 
     {
-        private User user;
+        private User _user;
 
         public LoginViewModel()
         {
             this.LoginCommand = new DelegateCommand<object>(Login);
             this.SubscribeCommand = new DelegateCommand<object>(Subscribe);
-            this.user = new User();
+            this._user = new User();
         }
 
         public ICommand LoginCommand { get; private set; }
         public ICommand SubscribeCommand { get; private set; }
         public User User
         {
-            get { return this.user; }
-            set { SetProperty(ref this.user, value); }
+            get { return this._user; }
+            set { SetProperty(ref this._user, value); }
         }
 
         private void Login(object password)
@@ -40,9 +40,9 @@ namespace ChatClient.ViewModels
             }
 
             //user.Password = Encode_Pass(((PasswordBox)password).Password);
-            user.Password = ((PasswordBox)password).Password;
+            User.Password = ((PasswordBox)password).Password;
 
-            if (Client.LogClient(user))
+            if (Client.LogClient(User))
             {
                 //reponse positive, on a pas recu Error! => On est logger
                 Container.GetA<MainViewModel>().NavigateToView(Container.GetA<LobbyViewModel>());
@@ -58,9 +58,9 @@ namespace ChatClient.ViewModels
             }
 
             //user.Password = Encode_Pass(((PasswordBox)password).Password);
-            user.Password = ((PasswordBox)password).Password;
+            User.Password = ((PasswordBox)password).Password;
 
-            if (Client.SubClient(user))
+            if (Client.SubClient(User))
             {
                 //move to profil creation and set the profile from lobby information
                 Container.GetA<EditProfileViewModel>().Profile = Container.GetA<LobbyViewModel>().Lobby.ClientProfile;

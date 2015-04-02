@@ -17,6 +17,13 @@ namespace ChatClient.ViewModels
         private bool _isInRoom;
         private Lobby _lobby;
 
+        public LobbyViewModel()
+        {
+            DisconnectCommand = new DelegateCommand(Disconnect);
+            EditProfileCommand = new DelegateCommand(EditProfile);
+        }
+
+
         public Lobby Lobby
         {
             get { return _lobby; }
@@ -35,12 +42,6 @@ namespace ChatClient.ViewModels
         }
         public ICommand DisconnectCommand { get; private set; }
         public ICommand EditProfileCommand { get; private set; }
-
-        public LobbyViewModel()
-        {
-            DisconnectCommand = new DelegateCommand(Disconnect);
-            EditProfileCommand = new DelegateCommand(EditProfile);
-        }
 
         public void Disconnect()
         {
