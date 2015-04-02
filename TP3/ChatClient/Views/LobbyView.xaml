@@ -25,12 +25,14 @@
                   Width="143" />
 
         <Button Content="Quitter salle"
+                Command="{Binding LeaveRoomCommand}"
                 HorizontalAlignment="Left"
                 Margin="521,113,0,0"
                 VerticalAlignment="Top"
                 Width="96"
                 Height="31" />
         <Button Content="Déconnecter"
+                Command="{Binding DisconnectCommand}"
                 HorizontalAlignment="Left"
                 Margin="524,63,0,0"
                 VerticalAlignment="Top"
@@ -51,6 +53,7 @@
                  VerticalAlignment="Top"
                  Width="266" />
         <Button Content="Envoyer"
+                Command="{Binding SendMessageCommand}"
                 HorizontalAlignment="Left"
                 Margin="482,428,0,0"
                 VerticalAlignment="Top"
@@ -62,6 +65,7 @@
                   Height="252"
                   Width="143" />
         <Button Content="Modifier profil"
+                Command="{Binding EditProfileCommand}"
                 HorizontalAlignment="Left"
                 Margin="115,93,0,0"
                 VerticalAlignment="Top"
