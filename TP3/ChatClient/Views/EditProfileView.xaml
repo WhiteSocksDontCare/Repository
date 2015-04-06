@@ -14,8 +14,8 @@
     
     <Grid d:DataContext="{StaticResource DesignViewModel}">
         <Label Content="Pseudo" HorizontalAlignment="Left" Margin="10,37,0,0" VerticalAlignment="Top"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="10,63,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"
-                 Text="{Binding Profile.Pseudo}"/>
+        <Label HorizontalAlignment="Left" Height="23" Margin="10,63,0,0" VerticalAlignment="Top" Width="120"
+                 Content="{Binding Profile.Pseudo}"/>
         <Label Content="First name" HorizontalAlignment="Left" Margin="10,91,0,0" VerticalAlignment="Top"/>
         <TextBox HorizontalAlignment="Left" Height="23" Margin="10,117,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"
                  Text="{Binding Profile.FirstName}"/>
@@ -37,12 +37,9 @@
         <Label Content="{Binding Profile.NbDislike}" HorizontalAlignment="Left" Margin="181,268,0,0" VerticalAlignment="Top" Height="26" Width="62"/>
         <Label Content="{Binding Profile.NbMessage}" HorizontalAlignment="Left" Margin="181,294,0,0" VerticalAlignment="Top" Height="26" Width="62"/>
         <Label Content="{Binding Profile.NbDeletedMessage}" HorizontalAlignment="Left" Margin="181,320,0,0" VerticalAlignment="Top" Height="26" Width="62"/>
-
-        <Button Content="Return to lobby" HorizontalAlignment="Left" Margin="10,351,0,0" Padding="5" VerticalAlignment="Top" Width="99"
-                Command="{Binding ReturnToLobbyCommand}"/>
         <Button Content="Cancel" HorizontalAlignment="Left" Margin="10,351,0,0" Padding="5" VerticalAlignment="Top" Width="99"
                 Command="{Binding CancelCommand}"/>
-        <Button Content="Save" HorizontalAlignment="Left" Margin="10,351,0,0" Padding="5" VerticalAlignment="Top" Width="99"
+        <Button Content="Save" HorizontalAlignment="Left" Margin="114,351,0,0" Padding="5" VerticalAlignment="Top" Width="99"
                 Command="{Binding SaveCommand}"/>
     </Grid>
 </UserControl>

@@ -106,6 +106,26 @@ namespace ChatClient
             return false;
         }
 
+        public static bool UpdateProfile(Profile profile)
+        {
+            try
+            {
+                Send("EditProfile", profile.Serialize());
+                sendDone.WaitOne();
+
+                Receive();
+                receiveDone.WaitOne();
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            return false;
+        }
+
         public static bool DisconnectClient()
         {
             try

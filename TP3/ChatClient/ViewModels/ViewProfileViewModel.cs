@@ -18,7 +18,7 @@ namespace ChatClient.ViewModels
 
         public ViewProfileViewModel()
         {
-            EditCommand = new DelegateCommand(EditProfile);
+            //EditCommand = new DelegateCommand(EditProfile);
             ReturnToLobbyCommand = new DelegateCommand(ReturnToLobby);
             _profile = new Profile();
         }
@@ -29,15 +29,15 @@ namespace ChatClient.ViewModels
             set { SetProperty(ref _profile, value); }
         }
 
-        public ICommand EditCommand { get; private set; }
+        //public ICommand EditCommand { get; private set; }
         public ICommand ReturnToLobbyCommand { get; private set; }
 
 
-        public void EditProfile()
-        {
-            Container.GetA<EditProfileViewModel>().Profile = this.Profile;
-            Container.GetA<MainViewModel>().NavigateToView(Container.GetA<EditProfileViewModel>());
-        }
+        //public void EditProfile()
+        //{
+        //    Container.GetA<EditProfileViewModel>().Profile = this.Profile;
+        //    Container.GetA<MainViewModel>().NavigateToView(Container.GetA<EditProfileViewModel>());
+        //}
 
         public void ReturnToLobby()
         {

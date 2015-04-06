@@ -208,13 +208,13 @@ namespace ChatServer
                         Logout(handler);
                         break;
                     }
-                case "CreateProfile":
-                    {
-                        var profile = messageArray[1].Deserialize<Profile>();
-                        CreateProfile(profile);
-                        UpdateLobby(handler, profile);
-                        break;
-                    }
+                //case "CreateProfile":
+                //    {
+                //        var profile = messageArray[1].Deserialize<Profile>();
+                //        CreateProfile(profile);
+                //        UpdateLobby(handler, profile);
+                //        break;
+                //    }
                 case "EditProfile":
                     {
                         EditProfile(handler, messageArray[1].Deserialize<Profile>());
