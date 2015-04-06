@@ -3,8 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:VM="clr-namespace:ChatClient.ViewModels"
              mc:Ignorable="d" Height="408.015" Width="455.649">
-    <Grid>
+    <UserControl.Resources>
+        <VM:RoomViewModel x:Key="DesignViewModel" />
+    </UserControl.Resources>
+    <Grid d:DataContext="{StaticResource DesignViewModel}">
 
         <TextBox HorizontalAlignment="Left"
                  Height="252"

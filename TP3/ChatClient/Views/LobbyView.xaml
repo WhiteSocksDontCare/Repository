@@ -4,20 +4,19 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:converters="clr-namespace:ChatClient.Converters"
+             xmlns:VM="clr-namespace:ChatClient.ViewModels"
              xmlns:views="clr-namespace:ChatClient.Views"
              mc:Ignorable="d"
              x:Name="UserControl"
              d:DesignWidth="640"
              d:DesignHeight="550">
+    
     <UserControl.Resources>
+        <VM:LobbyViewModel x:Key="DesignViewModel" />
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></converters:BooleanToVisibilityConverter>
     </UserControl.Resources>
-
-    <Grid HorizontalAlignment="Left"
-          Height="537"
-          VerticalAlignment="Top"
-          Width="714"
-          Margin="0,0,-74,-57">
+    
+    <Grid d:DataContext="{StaticResource DesignViewModel}">
         <ListView HorizontalAlignment="Left"
                   Margin="10,159,0,0"
                   VerticalAlignment="Top"
@@ -70,7 +69,7 @@
                HorizontalAlignment="Left"
                Margin="115,45,0,0"
                VerticalAlignment="Top" />
-        <views:RoomView Margin="187,129,71,10"
+        <views:RoomView Margin="174,129,10,13.4"
                         Visibility="{Binding IsInRoom, Converter={StaticResource BooleanToVisibilityConverter}}"
                         DataContext="{Binding RoomViewModel}" />
     </Grid>
