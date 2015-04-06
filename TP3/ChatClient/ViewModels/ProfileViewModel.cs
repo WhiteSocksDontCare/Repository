@@ -1,25 +1,25 @@
-﻿using System;
+﻿using ChatCommunication;
+using Microsoft.Practices.Prism.Commands;
+using Microsoft.Practices.Prism.Mvvm;
+using MVVM.Container;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Practices.Prism.Mvvm;
-using Microsoft.Practices.Prism.Commands;
 using System.Windows.Input;
-using ChatCommunication;
-using MVVM.Container;
 
+//Ceci est un profil dans une liste
 namespace ChatClient.ViewModels
 {
-    class ProfileViewModel  : BindableBase
+    class ProfileViewModel : BindableBase
     {
-
-        Profile _profile;
+        private Profile _profile;
 
         public ProfileViewModel()
         {
-            EditCommand = new DelegateCommand(EditProfile);
-            ReturnToLobbyCommand = new DelegateCommand(ReturnToLobby);
+            ViewProfileCommand = new DelegateCommand(ViewProfile);
+            _profile = new Profile();
         }
 
         public Profile Profile
@@ -28,19 +28,15 @@ namespace ChatClient.ViewModels
             set { SetProperty(ref _profile, value); }
         }
 
-        public ICommand EditCommand { get; private set; }
-        public ICommand ReturnToLobbyCommand { get; private set; }
+        public ICommand ViewProfileCommand { get; private set; }
 
 
-        public void EditProfile()
+        public void ViewProfile()
         {
-            Container.GetA<EditProfileViewModel>().Profile = this.Profile;
-            Container.GetA<MainViewModel>().NavigateToView(Container.GetA<EditProfileViewModel>());
-        }
+            //SendMessage
 
-        public void ReturnToLobby()
-        {
-            Container.GetA<MainViewModel>().NavigateToView(Container.GetA<LobbyViewModel>());
+            //then
+            Container.GetA<MainViewModel>().NavigateToView(Container.GetA<ViewProfileViewModel>());
         }
     }
 }

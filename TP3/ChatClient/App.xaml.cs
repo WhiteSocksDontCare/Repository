@@ -20,12 +20,10 @@ namespace ChatClient
             base.OnStartup(e);
             var container = new MicrokernelContainer();
 
-            //Interface entre les braquette ?
             container.RegisterA<LobbyViewModel>(typeof(LobbyViewModel));
             container.RegisterA<LoginViewModel>(typeof(LoginViewModel));
-            container.RegisterA<ProfileViewModel>(typeof(ProfileViewModel));
+            container.RegisterA<ViewProfileViewModel>(typeof(ViewProfileViewModel));
             container.RegisterA<EditProfileViewModel>(typeof(EditProfileViewModel));
-            container.RegisterA<RoomViewModel>(typeof(RoomViewModel));
             container.RegisterA<MainViewModel>(typeof(MainViewModel));
 
             Container.InitializeContainerWith(container);

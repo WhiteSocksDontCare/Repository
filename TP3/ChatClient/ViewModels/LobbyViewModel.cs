@@ -18,7 +18,9 @@ namespace ChatClient.ViewModels
         private bool _isInRoom;
         private Lobby _lobby;
         private Thread _updateLobby;
-       
+        private Profile _userProfile;
+        private RoomViewModel _roomViewModel;
+
 
         public LobbyViewModel()
         {
@@ -28,6 +30,9 @@ namespace ChatClient.ViewModels
 
             _updateLobby = new Thread(UpdateLobby);
             _updateLobby.Start();
+
+            _lobby = new Lobby();
+            _roomViewModel = new RoomViewModel();
         }
 
         public void UpdateLobby()
@@ -46,7 +51,7 @@ namespace ChatClient.ViewModels
 
         public RoomViewModel RoomViewModel
         {
-            get { return Container.GetA<RoomViewModel>(); }
+            get { return _roomViewModel; }
         }
  
         public bool IsInRoom
@@ -70,7 +75,7 @@ namespace ChatClient.ViewModels
 
         public void ViewProfile()
         {
-            Container.GetA<MainViewModel>().NavigateToView(Container.GetA<ProfileViewModel>());
+            Container.GetA<MainViewModel>().NavigateToView(Container.GetA<ViewProfileViewModel>());
         }
 
     }

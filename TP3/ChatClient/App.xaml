@@ -6,8 +6,8 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
 
-        <DataTemplate DataType="{x:Type ViewModels:ProfileViewModel}">
-            <Views:ProfileView />
+        <DataTemplate DataType="{x:Type ViewModels:ViewProfileViewModel}">
+            <Views:ViewProfileView />
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type ViewModels:EditProfileViewModel}">

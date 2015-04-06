@@ -21,6 +21,7 @@ namespace ChatClient.ViewModels
             CancelCommand = new DelegateCommand(CancelModification);
             SaveCommand = new DelegateCommand(SaveModification);
             ReturnToLobbyCommand = new DelegateCommand(ReturnToLobby);
+            _profile = new Profile();
         }
 
         public Profile Profile
@@ -44,7 +45,7 @@ namespace ChatClient.ViewModels
             bool succes = true;
             if (succes)
             {
-                Container.GetA<ProfileViewModel>().Profile = this.Profile;
+                Container.GetA<ViewProfileViewModel>().Profile = this.Profile;
                 Container.GetA<LobbyViewModel>().Lobby.ClientProfile = this.Profile;
                 Container.GetA<MainViewModel>().NavigateToView(Container.GetA<LobbyViewModel>());
             }
@@ -55,7 +56,7 @@ namespace ChatClient.ViewModels
             bool succes = true;
             if (succes)
             {
-                Container.GetA<MainViewModel>().NavigateToView(Container.GetA<ProfileViewModel>());
+                Container.GetA<MainViewModel>().NavigateToView(Container.GetA<ViewProfileViewModel>());
             }
         }
 
