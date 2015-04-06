@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -13,8 +14,8 @@ namespace ChatCommunication
     public class Lobby
     {
         public Profile ClientProfile { get; set; }
-        public List<Profile> OtherUsers { get; set; }
-        public List<Room> AllRooms { get; set; }
+        public ObservableCollection<Profile> OtherUsers { get; set; }
+        public ObservableCollection<Room> AllRooms { get; set; }
     }
 
     public class Profile
@@ -77,8 +78,8 @@ namespace ChatCommunication
         public string Name { get; set; }
         public string Description { get; set; }
         public bool IsDeleted { get; set; }
-        public List<Profile> SubscribedUsers { get; set; }
-        public List<Message> Messages { get; set; }
+        public ObservableCollection<Profile> SubscribedUsers { get; set; }
+        public ObservableCollection<Message> Messages { get; set; }
     }
 
     public class User

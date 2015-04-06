@@ -8,6 +8,7 @@ using System.Windows.Input;
 using Microsoft.Practices.Prism.Commands;
 using ChatCommunication;
 using MVVM.Container;
+using System.Collections.ObjectModel;
 
 namespace ChatClient.ViewModels
 {
@@ -20,6 +21,9 @@ namespace ChatClient.ViewModels
         {
             LeaveRoomCommand = new DelegateCommand(LeaveRoom);
             SendMessageCommand = new DelegateCommand(SendMessage);
+            Room = new Room();
+            ObservableCollection<Message> msg = new ObservableCollection<Message>(Room.Messages);
+            Room.Messages
         }
 
         public Room Room
@@ -29,10 +33,10 @@ namespace ChatClient.ViewModels
         }
 
         //Utile pour les élement d'une liste. car un message doit etre texte + like ou dislike
-        //public ObservableCollection<MessageViewModel> MessageViewModels
-        //{
-        //    get { return Container.GetA<MessageViewModel>(); }
-        //}
+        public ObservableCollection<MessageViewModel> MessageViewModels
+        {
+            get { return Container.GetA<MessageViewModel>(); }
+        }
 
 
         public ICommand LeaveRoomCommand { get; private set; }
