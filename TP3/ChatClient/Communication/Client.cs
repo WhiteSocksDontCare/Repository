@@ -189,7 +189,7 @@ namespace ChatClient
                 //UpdateRoom -> Recu seulement quand le client est dans une room
                 case "UpdateRoom":
                     Room room = messageArray[1].Deserialize<Room>();
-                    Container.GetA<RoomViewModel>().Room = room;
+                    //Container.GetA<RoomViewModel>().Room = room;
                     break;
                 //UpdateProfile -> recu dans le cas d'une consultation de profil (sois-meme ou autre)
                 case "UpdateProfile":

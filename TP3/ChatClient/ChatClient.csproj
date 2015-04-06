@@ -85,6 +85,7 @@
     </Compile>
     <Compile Include="Navigation\NavigateToViewCommand.cs" />
     <Compile Include="Navigation\WpfCommand.cs" />
+    <Compile Include="Utils\ObservableViewModelCollection.cs" />
     <Compile Include="ViewModels\EditProfileViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\MessageViewModel.cs" />
