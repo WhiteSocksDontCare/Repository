@@ -25,7 +25,7 @@ namespace ChatServer
         public byte[] Buffer = new byte[BufferSize];
     }
 
-    class ChatServer
+    class ChatServer : IDisposable
     {
         private static double UPDATE_INTERVAL = 30000;  //Intervale de temps entre deux mises à jour des lobbys vers les clients (30 secondes)
         private static double SAVE_INTERVAL = 600000;  //Intervale de temps entre deux save des listes dans le fichier XML (10 minutes)
@@ -47,6 +47,28 @@ namespace ChatServer
         private static List<Message> messages = new List<Message>();
         private static int messageID = 0;
         private static Lobby lobby = new Lobby();
+        private bool disposed = true;
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposed)
+                return;
+            if (disposing)
+            {
+                foreach (var client in onlineClients)
+                {
+                    client.Key.Shutdown(SocketShutdown.Both);
+                    client.Key.Close();
+                }
+            }
+            disposed = true;
+        }
 
         public static void LoadServerInfos()
         {
@@ -257,9 +279,6 @@ namespace ChatServer
 
                 int bytesSent = handler.EndSend(ar);
                 Console.WriteLine("Sent {0} bytes to client.", bytesSent);
-
-                handler.Shutdown(SocketShutdown.Both);
-                handler.Close();
             }
             catch (Exception e)
             {
