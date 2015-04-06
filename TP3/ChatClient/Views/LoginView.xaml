@@ -3,13 +3,16 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:VM="clr-namespace:ChatClient.ViewModels" 
         mc:Ignorable="d"
              x:Name="UserControl"
              d:DesignWidth="640"
              d:DesignHeight="480">
-
-    <Grid>
+    <UserControl.Resources>
+        <VM:LoginViewModel x:Key="DesignViewModel" />
+    </UserControl.Resources>
+    <Grid d:DataContext="{StaticResource DesignViewModel}">
         <TextBox x:Name="Username"
                  HorizontalAlignment="Left"
                  Height="23"
