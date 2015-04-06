@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Controls.Primitives;
 using System.Xml.Serialization;
 using ChatCommunication;
@@ -119,6 +120,23 @@ namespace ChatClient
             }
             return false;
         }
+
+        public static bool UpdateLobby()
+        {
+            try
+            {
+                Receive();
+                receiveDone.WaitOne();
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            return false;
+        }
+
         private static void ConnectCallback(IAsyncResult ar)
         {
             try

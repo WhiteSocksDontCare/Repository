@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -16,26 +17,31 @@ namespace ChatClient.ViewModels
     {
         private bool _isInRoom;
         private Lobby _lobby;
-        private Profile _userProfile;
+        private Thread _updateLobby;
+       
 
         public LobbyViewModel()
         {
             DisconnectCommand = new DelegateCommand(Disconnect);
             EditProfileCommand = new DelegateCommand(EditProfile);
             ViewProfileCommand = new DelegateCommand(ViewProfile);
+
+            _updateLobby = new Thread(UpdateLobby);
+            _updateLobby.Start();
         }
 
+        public void UpdateLobby()
+        {
+            while (true)
+            {
+                Client.UpdateLobby();
+            }
+        }
 
         public Lobby Lobby
         {
             get { return _lobby; }
             set { SetProperty(ref _lobby, value); }
-        }
-
-        public Profile Profile
-        {
-            get { return _userProfile; }
-            set { SetProperty(ref _userProfile, value); }
         }
 
         public RoomViewModel RoomViewModel

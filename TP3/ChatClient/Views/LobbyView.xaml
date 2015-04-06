@@ -22,7 +22,8 @@
                   Margin="10,159,0,0"
                   VerticalAlignment="Top"
                   Height="140"
-                  Width="143" />
+                  Width="143" 
+                  ItemsSource="{Binding Lobby.OtherUsers, UpdateSourceTrigger=PropertyChanged}"/>
         <ListView HorizontalAlignment="Left"
                   Margin="10,335,0,0"
                   VerticalAlignment="Top"
@@ -66,10 +67,10 @@
                Margin="10,28,0,0"
                VerticalAlignment="Top"
                Width="100" />
-        <Label Content="Label"
+        <Label Content="{Binding Lobby.ClientProfile.Pseudo}"
                HorizontalAlignment="Left"
                Margin="115,45,0,0"
-               VerticalAlignment="Top" />
+               VerticalAlignment="Top"/>
         <views:RoomView Margin="187,129,71,10"
                         Visibility="{Binding IsInRoom, Converter={StaticResource BooleanToVisibilityConverter}}"
                         DataContext="{Binding RoomViewModel}" />

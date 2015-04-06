@@ -80,6 +80,12 @@ namespace ChatCommunication
         public bool IsDeleted { get; set; }
         public ObservableCollection<Profile> SubscribedUsers { get; set; }
         public ObservableCollection<Message> Messages { get; set; }
+
+        public Room()
+        {
+            Messages = new ObservableCollection<Message>();
+            SubscribedUsers = new ObservableCollection<Profile>();
+        }
     }
 
     public class User
