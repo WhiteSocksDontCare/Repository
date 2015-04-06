@@ -18,9 +18,8 @@ namespace ChatClient.ViewModels
 
         public ProfileViewModel()
         {
-            BrowseCommand = new DelegateCommand(BrowseImage);
             EditCommand = new DelegateCommand(EditProfile);
-            LeaveCommand = new DelegateCommand(LeaveProfile);
+            ReturnToLobbyCommand = new DelegateCommand(ReturnToLobby);
         }
 
         public Profile Profile
@@ -29,15 +28,9 @@ namespace ChatClient.ViewModels
             set { SetProperty(ref _profile, value); }
         }
 
-
-        public ICommand BrowseCommand { get; private set; }
         public ICommand EditCommand { get; private set; }
-        public ICommand LeaveCommand { get; private set; }
+        public ICommand ReturnToLobbyCommand { get; private set; }
 
-        public void BrowseImage()
-        {
-            //TODO: Browse an image.
-        }
 
         public void EditProfile()
         {
@@ -45,7 +38,7 @@ namespace ChatClient.ViewModels
             Container.GetA<MainViewModel>().NavigateToView(Container.GetA<EditProfileViewModel>());
         }
 
-        public void LeaveProfile()
+        public void ReturnToLobby()
         {
             Container.GetA<MainViewModel>().NavigateToView(Container.GetA<LobbyViewModel>());
         }
