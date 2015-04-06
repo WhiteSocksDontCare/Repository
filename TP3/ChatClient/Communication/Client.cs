@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Controls.Primitives;
 using System.Xml.Serialization;
 using ChatCommunication;
@@ -119,6 +120,23 @@ namespace ChatClient
             }
             return false;
         }
+
+        public static bool UpdateLobby()
+        {
+            try
+            {
+                Receive();
+                receiveDone.WaitOne();
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            return false;
+        }
+
         private static void ConnectCallback(IAsyncResult ar)
         {
             try
@@ -189,13 +207,12 @@ namespace ChatClient
                 //UpdateRoom -> Recu seulement quand le client est dans une room
                 case "UpdateRoom":
                     Room room = messageArray[1].Deserialize<Room>();
-                    Container.GetA<LobbyViewModel>().RoomViewModel.Room = room;
+                    Container.GetA<RoomViewModel>().Room = room;
                     break;
-                //UpdateProfile -> recu dans le cas d'une consultation de profil (sois-meme ou autre) et Modification
+                //UpdateProfile -> recu dans le cas d'une consultation de profil (sois-meme ou autre)
                 case "UpdateProfile":
                     Profile profile = messageArray[1].Deserialize<Profile>();
-                    Container.GetA<ViewProfileViewModel>().Profile = profile;
-                    Container.GetA<EditProfileViewModel>().Profile = profile;
+                    // TODO : Afficher le profil reçu.
                     break;
                 default:
                     throw new Exception("Commande '" + commandType + "' non reconnue.");
