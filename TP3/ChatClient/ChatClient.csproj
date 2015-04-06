@@ -89,6 +89,7 @@
     <Compile Include="ViewModels\EditProfileViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\MessageViewModel.cs" />
+    <Compile Include="ViewModels\ProfileViewModel.cs" />
     <Compile Include="Views\EditProfileView.xaml.cs">
       <DependentUpon>EditProfileView.xaml</DependentUpon>
     </Compile>
@@ -97,6 +98,9 @@
     </Compile>
     <Compile Include="Views\MessageView.xaml.cs">
       <DependentUpon>MessageView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ProfileView.xaml.cs">
+      <DependentUpon>ProfileView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ViewProfileView.xaml.cs">
       <DependentUpon>ViewProfileView.xaml</DependentUpon>
@@ -141,6 +145,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\MessageView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ProfileView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

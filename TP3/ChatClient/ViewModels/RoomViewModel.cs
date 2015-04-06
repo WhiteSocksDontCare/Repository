@@ -21,7 +21,7 @@ namespace ChatClient.ViewModels
 
         private Room _room;
         private readonly Lazy<ObservableCollection<MessageViewModel>> _messages;
-        private readonly Lazy<ObservableCollection<MessageViewModel>> _users;
+        private readonly Lazy<ObservableCollection<ProfileViewModel>> _subscribedUsers;
 
         public RoomViewModel()
         {
@@ -30,21 +30,27 @@ namespace ChatClient.ViewModels
             _room = new Room();
 
             //Alex: test de creation d'une ObservableCollection sync entre la vue et le model
-            Func<Message, MessageViewModel> viewModelCreator = model => new MessageViewModel() { Message = model };
-            Func<ObservableCollection<MessageViewModel>> collectionCreator =
-                () => new ObservableViewModelCollection<MessageViewModel, Message>(Room.Messages, viewModelCreator);
-            _messages = new Lazy<ObservableCollection<MessageViewModel>>(collectionCreator);
+            //_messages
+            Func<Message, MessageViewModel> messageViewModelCreator = model => new MessageViewModel() { Message = model };
+            Func<ObservableCollection<MessageViewModel>> messageCollectionCreator =
+                () => new ObservableViewModelCollection<MessageViewModel, Message>(Room.Messages, messageViewModelCreator);
+            _messages = new Lazy<ObservableCollection<MessageViewModel>>(messageCollectionCreator);
 
-
-            //Func<Message, MessageViewModel> viewModelCreator = model => new MessageViewModel() { Message = model };
-            //Func<ObservableCollection<MessageViewModel>> collectionCreator =
-            //    () => new ObservableViewModelCollection<MessageViewModel, Message>(Room.Messages, viewModelCreator);
-            //_messages = new Lazy<ObservableCollection<MessageViewModel>>(collectionCreator);
+            //_subscribedUsers
+            Func<Profile, ProfileViewModel> profileViewModelCreator = model => new ProfileViewModel() { Profile = model };
+            Func<ObservableCollection<ProfileViewModel>> profileCollectionCreator =
+                () => new ObservableViewModelCollection<ProfileViewModel, Profile>(Room.SubscribedUsers, profileViewModelCreator);
+            _subscribedUsers = new Lazy<ObservableCollection<ProfileViewModel>>(profileCollectionCreator);
         }
 
         public ObservableCollection<MessageViewModel> MessageViewModels
         {
             get { return _messages.Value; }
+        }
+
+        public ObservableCollection<ProfileViewModel> ProfileViewModels
+        {
+            get { return _subscribedUsers.Value; }
         }
 
         public Room Room
