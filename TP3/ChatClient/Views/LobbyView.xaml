@@ -23,7 +23,16 @@
                   VerticalAlignment="Top"
                   Height="140"
                   Width="143" 
-                  ItemsSource="{Binding Lobby.OtherUsers, UpdateSourceTrigger=PropertyChanged}"/>
+                  ItemsSource="{Binding Lobby.OtherUsers, UpdateSourceTrigger=PropertyChanged}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <WrapPanel>
+                        <Image></Image>
+                        <TextBlock Text="{Binding Pseudo}"></TextBlock>
+                    </WrapPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
         <ListView HorizontalAlignment="Left"
                   Margin="10,335,0,0"
                   VerticalAlignment="Top"
