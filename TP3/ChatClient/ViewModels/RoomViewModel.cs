@@ -7,8 +7,12 @@ using Microsoft.Practices.Prism.Mvvm;
 using System.Windows.Input;
 using Microsoft.Practices.Prism.Commands;
 using ChatCommunication;
+using ChatCommunication.Extension;
 using MVVM.Container;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Diagnostics;
+using ChatClient.Utils;
 
 namespace ChatClient.ViewModels
 {
@@ -16,26 +20,30 @@ namespace ChatClient.ViewModels
     {
 
         private Room _room;
+        private readonly Lazy<ObservableCollection<MessageViewModel>> _messages;
 
         public RoomViewModel()
         {
             LeaveRoomCommand = new DelegateCommand(LeaveRoom);
             SendMessageCommand = new DelegateCommand(SendMessage);
-            Room = new Room();
-            ObservableCollection<Message> msg = new ObservableCollection<Message>(Room.Messages);
-            Room.Messages
+            _room = new Room();
+
+            //Alex: test de creation d'une ObservableCollection sync entre la vue et le model
+            Func<Message, MessageViewModel> viewModelCreator = model => new MessageViewModel() { Message = model };
+            Func<ObservableCollection<MessageViewModel>> collectionCreator =
+                () => new ObservableViewModelCollection<MessageViewModel, Message>(Room.Messages, viewModelCreator);
+            _messages = new Lazy<ObservableCollection<MessageViewModel>>(collectionCreator);
+        }
+
+        public ObservableCollection<MessageViewModel> MessageViewModels
+        {
+            get { return _messages.Value; }
         }
 
         public Room Room
         {
             get { return _room; }
             set { SetProperty(ref _room, value); }
-        }
-
-        //Utile pour les élement d'une liste. car un message doit etre texte + like ou dislike
-        public ObservableCollection<MessageViewModel> MessageViewModels
-        {
-            get { return Container.GetA<MessageViewModel>(); }
         }
 
 

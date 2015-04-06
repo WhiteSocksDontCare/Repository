@@ -16,6 +16,12 @@ namespace ChatCommunication
         public Profile ClientProfile { get; set; }
         public ObservableCollection<Profile> OtherUsers { get; set; }
         public ObservableCollection<Room> AllRooms { get; set; }
+
+        public Lobby()
+        {
+            OtherUsers = new ObservableCollection<Profile>();
+            AllRooms = new ObservableCollection<Room>();
+        }
     }
 
     public class Profile
@@ -80,6 +86,12 @@ namespace ChatCommunication
         public bool IsDeleted { get; set; }
         public ObservableCollection<Profile> SubscribedUsers { get; set; }
         public ObservableCollection<Message> Messages { get; set; }
+
+        public Room()
+        {
+            SubscribedUsers = new ObservableCollection<Profile>();
+            Messages = new ObservableCollection<Message>();
+        }
     }
 
     public class User

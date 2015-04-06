@@ -7,6 +7,7 @@ using System.Threading;
 using System.Text;
 using ChatCommunication;
 using System.Timers;
+using System.Collections.ObjectModel;
 
 namespace ChatServer
 {
@@ -427,11 +428,12 @@ namespace ChatServer
         /// <param name="message"></param>
         public static void DeleteMessage(Message message)
         {
+            //TODO: semble pas marcher. on compare jamais avec le MessageID pour trouver le message
             var message1 = messages.Find(x => x.Pseudo == message.Pseudo);
             message1.IsDeleted = true;
             var room = rooms.Find(x => x.IDRoom == message.IDRoom);
-            var message2 = room.Messages.Find(x => x.Pseudo == message.Pseudo);
-            message2.IsDeleted = true;
+            var message2 = room.Messages.Where(x => x.Pseudo == message.Pseudo);
+            //message2.IsDeleted = true;
             UpdateRoom(room);
         }
 
@@ -475,9 +477,9 @@ namespace ChatServer
         private static void UpdateLobby(Socket socket, Profile profile)
         {
             semaphoreLobby.WaitOne();
-            lobby.AllRooms = rooms;
+            lobby.AllRooms = new ObservableCollection<Room>(rooms);
             lobby.ClientProfile = profile;
-            lobby.OtherUsers = onlineClients.Where(x => x.Value != profile).Select(y => y.Value).ToList();
+            lobby.OtherUsers = new ObservableCollection<Profile>(onlineClients.Where(x => x.Value != profile).Select(y => y.Value).ToList());
             Send(socket, "UpdateLobby", lobby.Serialize());
             semaphoreLobby.Release();
         }

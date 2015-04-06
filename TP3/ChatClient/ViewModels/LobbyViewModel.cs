@@ -17,12 +17,15 @@ namespace ChatClient.ViewModels
         private bool _isInRoom;
         private Lobby _lobby;
         private Profile _userProfile;
+        private RoomViewModel _roomViewModel;
 
         public LobbyViewModel()
         {
             DisconnectCommand = new DelegateCommand(Disconnect);
             EditProfileCommand = new DelegateCommand(EditProfile);
             ViewProfileCommand = new DelegateCommand(ViewProfile);
+            _lobby = new Lobby();
+            _roomViewModel = new RoomViewModel();
         }
 
 
@@ -40,7 +43,7 @@ namespace ChatClient.ViewModels
 
         public RoomViewModel RoomViewModel
         {
-            get { return Container.GetA<RoomViewModel>(); }
+            get { return _roomViewModel; }
         }
  
         public bool IsInRoom
