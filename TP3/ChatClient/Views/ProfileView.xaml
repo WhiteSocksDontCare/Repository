@@ -9,19 +9,29 @@
         d:DesignHeight="480">
     <Grid>
         <Label Content="Pseudo" HorizontalAlignment="Left" Margin="10,37,0,0" VerticalAlignment="Top"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="10,63,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
+        <Label HorizontalAlignment="Left" Height="23" Margin="10,63,0,0" VerticalAlignment="Top" Width="120"
+               Content="{Binding Profile.Pseudo}"/>
         <Label Content="First name" HorizontalAlignment="Left" Margin="10,91,0,0" VerticalAlignment="Top"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="10,117,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
+        <Label HorizontalAlignment="Left" Height="23" Margin="10,117,0,0" VerticalAlignment="Top" Width="120"
+               Content="{Binding Profile.FirstName}"/>
         <Label Content="Last name" HorizontalAlignment="Left" Margin="10,145,0,0" VerticalAlignment="Top"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="10,171,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
+        <Label HorizontalAlignment="Left" Height="23" Margin="10,171,0,0" VerticalAlignment="Top" Width="120"
+               Content="{Binding Profile.LastName}"/>
         <Label Content="Avatar&#xD;&#xA;" HorizontalAlignment="Left" Margin="155,37,0,0" VerticalAlignment="Top"/>
         <Image HorizontalAlignment="Left" Height="103" Margin="155,63,0,0" VerticalAlignment="Top" Width="117"/>
-        <Button Content="Browse" HorizontalAlignment="Left" Margin="155,171,0,0" VerticalAlignment="Top" Width="75"/>
         <Label Content="Informations" FontWeight="Bold" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
         <Label Content="Statistics" FontWeight="Bold" HorizontalAlignment="Left" Margin="10,211,0,0" VerticalAlignment="Top"/>
         <Label Content="Number of messages liked :" HorizontalAlignment="Left" Margin="10,242,0,0" VerticalAlignment="Top"/>
         <Label Content="Number of messages deleted :" HorizontalAlignment="Left" Margin="10,320,0,0" VerticalAlignment="Top"/>
         <Label Content="Number of messages sent :" HorizontalAlignment="Left" Margin="10,294,0,0" VerticalAlignment="Top"/>
         <Label Content="Number of messages disliked :" HorizontalAlignment="Left" Margin="10,268,0,0" VerticalAlignment="Top"/>
+
+        <Label Content="{Binding Profile.NbLike}" HorizontalAlignment="Left" Margin="181,237,0,0" VerticalAlignment="Top" Height="26" Width="62"/>
+        <Label Content="{Binding Profile.NbDislike}" HorizontalAlignment="Left" Margin="181,268,0,0" VerticalAlignment="Top" Height="26" Width="62"/>
+        <Label Content="{Binding Profile.NbMessage}" HorizontalAlignment="Left" Margin="181,294,0,0" VerticalAlignment="Top" Height="26" Width="62"/>
+        <Label Content="{Binding Profile.NbDeletedMessage}" HorizontalAlignment="Left" Margin="181,320,0,0" VerticalAlignment="Top" Height="26" Width="62"/>
+
+        <Button Content="Return to lobby" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="5" Margin="10,381,0,0"
+                Command="{Binding ReturnToLobbyCommand}"/>
     </Grid>
 </UserControl>

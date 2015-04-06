@@ -17,8 +17,10 @@ namespace ChatClient.ViewModels
 
         public EditProfileViewModel()
         {
-            SaveCommand = new DelegateCommand(SaveModification);
+            BrowseCommand = new DelegateCommand(BrowseImage);
             CancelCommand = new DelegateCommand(CancelModification);
+            SaveCommand = new DelegateCommand(SaveModification);
+            ReturnToLobbyCommand = new DelegateCommand(ReturnToLobby);
         }
 
         public Profile Profile
@@ -27,9 +29,15 @@ namespace ChatClient.ViewModels
             set { SetProperty(ref _profile, value); }
         }
 
-
-        public ICommand SaveCommand { get; private set; }
         public ICommand CancelCommand { get; private set; }
+        public ICommand SaveCommand { get; private set; }
+        public ICommand ReturnToLobbyCommand { get; private set; }
+        public ICommand BrowseCommand { get; private set; }
+
+        public void BrowseImage()
+        {
+            //TODO: Browse an image.
+        }
 
         public void SaveModification()
         {
@@ -38,7 +46,7 @@ namespace ChatClient.ViewModels
             {
                 Container.GetA<ProfileViewModel>().Profile = this.Profile;
                 Container.GetA<LobbyViewModel>().Lobby.ClientProfile = this.Profile;
-                Container.GetA<MainViewModel>().NavigateToView(Container.GetA<ProfileViewModel>());
+                Container.GetA<MainViewModel>().NavigateToView(Container.GetA<LobbyViewModel>());
             }
         }
 
@@ -49,6 +57,11 @@ namespace ChatClient.ViewModels
             {
                 Container.GetA<MainViewModel>().NavigateToView(Container.GetA<ProfileViewModel>());
             }
+        }
+
+        public void ReturnToLobby()
+        {
+            Container.GetA<MainViewModel>().NavigateToView((Container.GetA<LobbyViewModel>()));
         }
     }
 }

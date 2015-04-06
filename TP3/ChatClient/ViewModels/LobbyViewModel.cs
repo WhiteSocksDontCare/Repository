@@ -16,11 +16,13 @@ namespace ChatClient.ViewModels
     {
         private bool _isInRoom;
         private Lobby _lobby;
+        private Profile _userProfile;
 
         public LobbyViewModel()
         {
             DisconnectCommand = new DelegateCommand(Disconnect);
             EditProfileCommand = new DelegateCommand(EditProfile);
+            ViewProfileCommand = new DelegateCommand(ViewProfile);
         }
 
 
@@ -28,6 +30,12 @@ namespace ChatClient.ViewModels
         {
             get { return _lobby; }
             set { SetProperty(ref _lobby, value); }
+        }
+
+        public Profile Profile
+        {
+            get { return _userProfile; }
+            set { SetProperty(ref _userProfile, value); }
         }
 
         public RoomViewModel RoomViewModel
@@ -42,6 +50,7 @@ namespace ChatClient.ViewModels
         }
         public ICommand DisconnectCommand { get; private set; }
         public ICommand EditProfileCommand { get; private set; }
+        public ICommand ViewProfileCommand { get; private set; }
 
         public void Disconnect()
         {
@@ -49,6 +58,11 @@ namespace ChatClient.ViewModels
         }
 
         public void EditProfile()
+        {
+            Container.GetA<MainViewModel>().NavigateToView(Container.GetA<EditProfileViewModel>());
+        }
+
+        public void ViewProfile()
         {
             Container.GetA<MainViewModel>().NavigateToView(Container.GetA<ProfileViewModel>());
         }

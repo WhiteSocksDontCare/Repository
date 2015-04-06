@@ -37,10 +37,17 @@
                 Width="93"
                 Height="31" />
 
+        <Button Content="Voir profil"
+                Command="{Binding ViewProfileCommand}"
+                HorizontalAlignment="Left"
+                Margin="110,102,0,0"
+                VerticalAlignment="Top"
+                Width="96"
+                Height="31" />
         <Button Content="Modifier profil"
                 Command="{Binding EditProfileCommand}"
                 HorizontalAlignment="Left"
-                Margin="115,93,0,0"
+                Margin="110,63,0,0"
                 VerticalAlignment="Top"
                 Width="96"
                 Height="31" />
