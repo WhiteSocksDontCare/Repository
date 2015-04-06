@@ -189,12 +189,13 @@ namespace ChatClient
                 //UpdateRoom -> Recu seulement quand le client est dans une room
                 case "UpdateRoom":
                     Room room = messageArray[1].Deserialize<Room>();
-                    //Container.GetA<RoomViewModel>().Room = room;
+                    Container.GetA<LobbyViewModel>().RoomViewModel.Room = room;
                     break;
-                //UpdateProfile -> recu dans le cas d'une consultation de profil (sois-meme ou autre)
+                //UpdateProfile -> recu dans le cas d'une consultation de profil (sois-meme ou autre) et Modification
                 case "UpdateProfile":
                     Profile profile = messageArray[1].Deserialize<Profile>();
-                    // TODO : Afficher le profil reçu.
+                    Container.GetA<ViewProfileViewModel>().Profile = profile;
+                    Container.GetA<EditProfileViewModel>().Profile = profile;
                     break;
                 default:
                     throw new Exception("Commande '" + commandType + "' non reconnue.");

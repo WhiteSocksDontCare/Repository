@@ -21,6 +21,7 @@ namespace ChatClient.ViewModels
 
         private Room _room;
         private readonly Lazy<ObservableCollection<MessageViewModel>> _messages;
+        private readonly Lazy<ObservableCollection<MessageViewModel>> _users;
 
         public RoomViewModel()
         {
@@ -33,6 +34,12 @@ namespace ChatClient.ViewModels
             Func<ObservableCollection<MessageViewModel>> collectionCreator =
                 () => new ObservableViewModelCollection<MessageViewModel, Message>(Room.Messages, viewModelCreator);
             _messages = new Lazy<ObservableCollection<MessageViewModel>>(collectionCreator);
+
+
+            //Func<Message, MessageViewModel> viewModelCreator = model => new MessageViewModel() { Message = model };
+            //Func<ObservableCollection<MessageViewModel>> collectionCreator =
+            //    () => new ObservableViewModelCollection<MessageViewModel, Message>(Room.Messages, viewModelCreator);
+            //_messages = new Lazy<ObservableCollection<MessageViewModel>>(collectionCreator);
         }
 
         public ObservableCollection<MessageViewModel> MessageViewModels

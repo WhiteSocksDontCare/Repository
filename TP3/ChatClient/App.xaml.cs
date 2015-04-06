@@ -22,7 +22,7 @@ namespace ChatClient
 
             container.RegisterA<LobbyViewModel>(typeof(LobbyViewModel));
             container.RegisterA<LoginViewModel>(typeof(LoginViewModel));
-            container.RegisterA<ProfileViewModel>(typeof(ProfileViewModel));
+            container.RegisterA<ViewProfileViewModel>(typeof(ViewProfileViewModel));
             container.RegisterA<EditProfileViewModel>(typeof(EditProfileViewModel));
             container.RegisterA<MainViewModel>(typeof(MainViewModel));
 

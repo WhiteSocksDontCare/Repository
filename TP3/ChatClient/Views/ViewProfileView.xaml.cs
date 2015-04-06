@@ -18,9 +18,9 @@ namespace ChatClient.Views
     /// <summary>
     /// Logique d'interaction pour ProfileView.xaml
     /// </summary>
-    public partial class ProfileView : UserControl
+    public partial class ViewProfileView : UserControl
     {
-        public ProfileView()
+        public ViewProfileView()
         {
             InitializeComponent();
         }

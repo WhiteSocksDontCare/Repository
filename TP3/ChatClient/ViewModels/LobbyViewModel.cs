@@ -67,7 +67,7 @@ namespace ChatClient.ViewModels
 
         public void ViewProfile()
         {
-            Container.GetA<MainViewModel>().NavigateToView(Container.GetA<ProfileViewModel>());
+            Container.GetA<MainViewModel>().NavigateToView(Container.GetA<ViewProfileViewModel>());
         }
 
     }

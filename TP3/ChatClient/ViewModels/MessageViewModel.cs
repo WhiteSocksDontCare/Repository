@@ -20,6 +20,7 @@ namespace ChatClient.ViewModels
             LikeCommand = new DelegateCommand(LikeMessage);
             DislikeCommand = new DelegateCommand(DislikeMessage);
             DeleteCommand = new DelegateCommand(DeleteMessage);
+            _message = new Message();
         }
 
         public Message Message

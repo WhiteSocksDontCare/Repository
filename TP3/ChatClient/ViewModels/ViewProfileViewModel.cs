@@ -11,15 +11,16 @@ using MVVM.Container;
 
 namespace ChatClient.ViewModels
 {
-    class ProfileViewModel  : BindableBase
+    class ViewProfileViewModel  : BindableBase
     {
 
         Profile _profile;
 
-        public ProfileViewModel()
+        public ViewProfileViewModel()
         {
             EditCommand = new DelegateCommand(EditProfile);
             ReturnToLobbyCommand = new DelegateCommand(ReturnToLobby);
+            _profile = new Profile();
         }
 
         public Profile Profile
