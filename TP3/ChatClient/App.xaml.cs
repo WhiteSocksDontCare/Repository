@@ -24,6 +24,7 @@ namespace ChatClient
             container.RegisterA<LoginViewModel>(typeof(LoginViewModel));
             container.RegisterA<ViewProfileViewModel>(typeof(ViewProfileViewModel));
             container.RegisterA<EditProfileViewModel>(typeof(EditProfileViewModel));
+            container.RegisterA<CreateRoomViewModel>(typeof(CreateRoomViewModel));
             container.RegisterA<MainViewModel>(typeof(MainViewModel));
 
             Container.InitializeContainerWith(container);

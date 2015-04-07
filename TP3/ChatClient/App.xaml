@@ -17,9 +17,13 @@
         <DataTemplate DataType="{x:Type ViewModels:LobbyViewModel}">
             <Views:LobbyView />
         </DataTemplate>
-        
+
         <DataTemplate DataType="{x:Type ViewModels:LoginViewModel}">
             <Views:LoginView />
+        </DataTemplate>
+        
+        <DataTemplate DataType="{x:Type ViewModels:CreateRoomViewModel}">
+            <Views:CreateRoomView />
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type ViewModels:MainViewModel}">

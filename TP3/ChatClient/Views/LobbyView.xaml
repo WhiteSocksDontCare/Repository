@@ -36,7 +36,16 @@
                   Margin="10,335,0,0"
                   VerticalAlignment="Top"
                   Height="140"
-                  Width="143" />
+                  Width="143" 
+                  ItemsSource="{Binding Lobby.AllRooms, UpdateSourceTrigger=PropertyChanged}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <WrapPanel>
+                        <TextBlock Text="{Binding Name}"></TextBlock>
+                    </WrapPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
 
         <Button Content="Déconnecter"
                 Command="{Binding DisconnectCommand}"
@@ -79,8 +88,15 @@
                HorizontalAlignment="Left"
                Margin="115,45,0,0"
                VerticalAlignment="Top"/>
-        <views:RoomView Margin="187,129,71,10"
-                        Visibility="{Binding IsInRoom, Converter={StaticResource BooleanToVisibilityConverter}}"
-                        DataContext="{Binding RoomViewModel}" />
+        <WrapPanel Margin="174,133,10,9.4" Orientation="Vertical" Visibility="{Binding IsInRoom, Converter={StaticResource BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
+            <views:RoomView DataContext="{Binding RoomViewModel}"/>
+        </WrapPanel>
+        <Button Content="Nouvelle Salle"
+        	Command="{Binding CreateRoomCommand}"
+        	HorizontalAlignment="Left"
+        	Margin="29,495,0,0"
+        	VerticalAlignment="Top"
+        	Width="96"
+        	Height="31" RenderTransformOrigin="0.152,4.039" />
     </Grid>
 </UserControl>

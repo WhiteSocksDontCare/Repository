@@ -86,10 +86,14 @@
     <Compile Include="Navigation\NavigateToViewCommand.cs" />
     <Compile Include="Navigation\WpfCommand.cs" />
     <Compile Include="Utils\ObservableViewModelCollection.cs" />
+    <Compile Include="ViewModels\CreateRoomViewModel.cs" />
     <Compile Include="ViewModels\EditProfileViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\MessageViewModel.cs" />
     <Compile Include="ViewModels\ProfileViewModel.cs" />
+    <Compile Include="Views\CreateRoomView.xaml.cs">
+      <DependentUpon>CreateRoomView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\EditProfileView.xaml.cs">
       <DependentUpon>EditProfileView.xaml</DependentUpon>
     </Compile>
@@ -111,6 +115,10 @@
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\CreateRoomView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\EditProfileView.xaml">
       <SubType>Designer</SubType>

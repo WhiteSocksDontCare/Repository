@@ -139,6 +139,19 @@ namespace ChatClient
             }
         }
 
+        public static void CreateRoom(Room room)
+        {
+            try
+            {
+                Send("CreateRoom", room.Serialize());
+                sendDone.WaitOne();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+
         public static bool DisconnectClient()
         {
             try
@@ -243,7 +256,6 @@ namespace ChatClient
                 case "UpdateLobby":
                     Lobby lobby = messageArray[1].Deserialize<Lobby>();
                     Container.GetA<LobbyViewModel>().Lobby = lobby;
-                    Container.GetA<EditProfileViewModel>().Profile = lobby.ClientProfile;
                     break;
                 //UpdateRoom -> Recu seulement quand le client est dans une room
                 case "UpdateRoom":
@@ -263,7 +275,8 @@ namespace ChatClient
                     break;
                 //SubscribeAnswer -> recu pour savoir si le Subscribe a marcher ou pas
                 case "SubscribeAnswer":
-                    result = messageArray[1].Equals("True");
+                    result = messageArray[1].Equals("True");                 
+                    Container.GetA<EditProfileViewModel>().Profile = Container.GetA<LobbyViewModel>().Lobby.ClientProfile;
                     Container.GetA<LoginViewModel>().SubscribeCallback(result);
                     break;
                 //EditProfileAnswer -> recu pour savoir si le l'edition a marcher ou pas

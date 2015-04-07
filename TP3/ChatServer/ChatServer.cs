@@ -49,7 +49,6 @@ namespace ChatServer
         private static List<Like> likes = new List<Like>();
         private static List<User> users = new List<User>();
         private static List<Message> messages = new List<Message>();
-        private static int messageID = 0;
         private static Lobby lobby = new Lobby();
         private bool disposed = true;
 
@@ -141,8 +140,6 @@ namespace ChatServer
                 ipAddress=addr;
             }
             var localEndPoint = new IPEndPoint(ipAddress, 11000);
-
-            messageID = messages.Count;
 
             var listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
@@ -395,8 +392,20 @@ namespace ChatServer
         /// <param name="room"></param>
         private static void CreateRoom(Socket handler, Room room)
         {
+            //leave room if he is already in one and create a new one
+            if (onlineClients[handler].IDRoom != -1)
+                LeaveRoom(handler, onlineClients[handler].IDRoom);
+
+            //create a new room and affect only name, description and correct ID.
+            if (messages.Count > 0)
+                room.IDRoom = rooms.Max(x => x.IDRoom) + 1;
+            else
+                room.IDRoom = 0;
+
             rooms.Add(room);
-            Send(handler, "UpdateRoom", room.Serialize());
+            //put the user in this room => updateRoom and updateLobby
+            JoinRoom(handler, room.IDRoom);
+            UpdateLobby(handler, onlineClients[handler]);
         }
 
         /// <summary>
@@ -436,7 +445,11 @@ namespace ChatServer
         /// <param name="message"></param>
         public static void SendMessage(Message message)
         {
-            message.IDMessage = messageID++;
+            if (messages.Count > 0)
+                message.IDMessage = messages.Max(x => x.IDMessage) + 1;
+            else
+                message.IDMessage = 0;
+
             // Ajoute à la liste de message du serveur
             messages.Add(message);
             var room = rooms.Find(x => x.IDRoom == message.IDRoom);
