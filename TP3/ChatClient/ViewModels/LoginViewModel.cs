@@ -68,8 +68,6 @@ namespace ChatClient.ViewModels
         {
             if (result)
             {
-                //move to profil creation and set the profile from lobby information
-                Container.GetA<EditProfileViewModel>().Profile = Container.GetA<LobbyViewModel>().Lobby.ClientProfile;
                 Container.GetA<MainViewModel>().NavigateToView(Container.GetA<EditProfileViewModel>());
             }
         }

@@ -32,7 +32,7 @@ namespace ChatClient
 
         private static readonly ManualResetEvent connectDone = new ManualResetEvent(false);
         private static readonly ManualResetEvent sendDone = new ManualResetEvent(false);
-        private static readonly ManualResetEvent receiveDone = new ManualResetEvent(false);
+        private static readonly AutoResetEvent receiveDone = new AutoResetEvent(false);
 
         private static bool response;
         private static Socket client = null;
@@ -243,6 +243,7 @@ namespace ChatClient
                 case "UpdateLobby":
                     Lobby lobby = messageArray[1].Deserialize<Lobby>();
                     Container.GetA<LobbyViewModel>().Lobby = lobby;
+                    Container.GetA<EditProfileViewModel>().Profile = lobby.ClientProfile;
                     break;
                 //UpdateRoom -> Recu seulement quand le client est dans une room
                 case "UpdateRoom":
