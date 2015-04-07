@@ -41,13 +41,16 @@ namespace ChatClient.ViewModels
 
             //user.Password = Encode_Pass(((PasswordBox)password).Password);
             User.Password = ((PasswordBox)password).Password;
+            Client.LogClient(User);
+        }
 
-            if (Client.LogClient(User))
+        public void LoginCallback(bool result)
+        {
+            if (result)
             {
                 //reponse positive, on a pas recu Error! => On est logger
                 Container.GetA<MainViewModel>().NavigateToView(Container.GetA<LobbyViewModel>());
             }
-
         }
 
         private void Subscribe(object password)
@@ -59,14 +62,16 @@ namespace ChatClient.ViewModels
 
             //user.Password = Encode_Pass(((PasswordBox)password).Password);
             User.Password = ((PasswordBox)password).Password;
-
-            if (Client.SubClient(User))
+            Client.SubClient(User);
+        }
+        public void SubscribeCallback(bool result)
+        {
+            if (result)
             {
                 //move to profil creation and set the profile from lobby information
                 Container.GetA<EditProfileViewModel>().Profile = Container.GetA<LobbyViewModel>().Lobby.ClientProfile;
                 Container.GetA<MainViewModel>().NavigateToView(Container.GetA<EditProfileViewModel>());
             }
-
         }
         private string Encode_Pass(string pass)
         {

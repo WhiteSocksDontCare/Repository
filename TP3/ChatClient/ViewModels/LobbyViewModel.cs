@@ -17,7 +17,6 @@ namespace ChatClient.ViewModels
     {
         private bool _isInRoom;
         private Lobby _lobby;
-        private Thread _updateLobby;
         private Profile _userProfile;
         private RoomViewModel _roomViewModel;
 
@@ -28,20 +27,10 @@ namespace ChatClient.ViewModels
             EditProfileCommand = new DelegateCommand(EditProfile);
             ViewProfileCommand = new DelegateCommand(ViewProfile);
 
-            _updateLobby = new Thread(UpdateLobby);
-            _updateLobby.Start();
-
             _lobby = new Lobby();
             _roomViewModel = new RoomViewModel();
         }
 
-        public void UpdateLobby()
-        {
-            while (true)
-            {
-                Client.UpdateLobby();
-            }
-        }
 
         public Lobby Lobby
         {

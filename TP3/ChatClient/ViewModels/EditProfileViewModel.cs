@@ -40,7 +40,11 @@ namespace ChatClient.ViewModels
 
         public void SaveModification()
         {
-            if (Client.UpdateProfile(Profile))
+            Client.UpdateProfile(Profile);
+        }
+        public void EditProfileCallback(bool result)
+        {
+            if (result)
             {
                 Container.GetA<LobbyViewModel>().Lobby.ClientProfile = this.Profile;
                 Container.GetA<MainViewModel>().NavigateToView(Container.GetA<LobbyViewModel>());

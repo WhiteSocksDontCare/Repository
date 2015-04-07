@@ -36,6 +36,7 @@ namespace ChatClient
 
         private static bool response;
         private static Socket client = null;
+        private static Thread threadlisten;
 
         public static bool IsConnected()
         {
@@ -58,6 +59,9 @@ namespace ChatClient
                 client.BeginConnect(remoteEP, ConnectCallback, client);
                 connectDone.WaitOne();
 
+                threadlisten = new Thread(new ThreadStart(listening));
+                threadlisten.Start();
+
                 return true;
             }
              catch (Exception ex)
@@ -66,64 +70,60 @@ namespace ChatClient
              }
              return false;
         }
-        public static bool LogClient(User user)
+
+        public static void listening()
+        {
+            while (true)
+            {
+                try
+                {
+                    Receive();
+                    receiveDone.WaitOne();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
+            }
+        }
+
+        public static void LogClient(User user)
         {
             try
             {
                 Send("Login", user.Serialize());
                 sendDone.WaitOne();
-
-                Receive();
-                receiveDone.WaitOne();
-
-                return response;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
                 
             }
-
-            return false;
         }
-        public static bool SubClient(User user)
+        public static void SubClient(User user)
         {
             try
             {
                 Send("Subscribe", user.Serialize());
                 sendDone.WaitOne();
-
-                Receive();
-                receiveDone.WaitOne();
-                
-                return response;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
             }
-
-            return false;
         }
 
-        public static bool UpdateProfile(Profile profile)
+        public static void UpdateProfile(Profile profile)
         {
             try
             {
                 Send("EditProfile", profile.Serialize());
                 sendDone.WaitOne();
-
-                Receive();
-                receiveDone.WaitOne();
-
-                return response;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
             }
-
-            return false;
         }
 
         public static bool DisconnectClient()
@@ -131,24 +131,11 @@ namespace ChatClient
             try
             {
                 client.Shutdown(SocketShutdown.Both);
+                client.Disconnect(true);
+                threadlisten.Abort();
+                threadlisten.Join();
                 client.Close();
                 return true;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
-            return false;
-        }
-
-        public static bool UpdateLobby()
-        {
-            try
-            {
-                Receive();
-                receiveDone.WaitOne();
-
-                return response;
             }
             catch (Exception ex)
             {
@@ -199,12 +186,31 @@ namespace ChatClient
             // Read data from the client socket. 
             var bytesRead = handler.EndReceive(ar);
 
-            if (bytesRead <= 0) return;
+            if (bytesRead > 0)
+            {
+                // There might be more data, so store the data received so far.
+                state.sb.Append(Encoding.ASCII.GetString(state.Buffer, 0, bytesRead));
 
-            var message = Encoding.ASCII.GetString(state.Buffer, 0, bytesRead);
+                // Get the rest of the data.
+                client.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReceiveCallback), state);
+            }
+            else
+            {
+                if (state.sb.Length > 1)
+                {
+                    Console.WriteLine(state.sb.ToString());
+                    ExecuteMessage(state.sb.ToString());
+                    receiveDone.Set();
+                    state.sb.Clear();
+                }
+            }
+        }
 
+        private static void ExecuteMessage(string message)
+        {
             var messageArray = message.Split(new char[] { '!' }, 2);
             var commandType = messageArray[0];
+            bool result;
             Console.WriteLine(commandType);
             response = true;
 
@@ -234,10 +240,24 @@ namespace ChatClient
                     Profile profile = messageArray[1].Deserialize<Profile>();
                     // TODO : Afficher le profil reçu.
                     break;
+                //LoginAnswer -> recu pour savoir si le login a marcher ou pas
+                case "LoginAnswer":
+                    result = messageArray[1].Equals("True");
+                    Container.GetA<LoginViewModel>().LoginCallback(result);
+                    break;
+                //SubscribeAnswer -> recu pour savoir si le Subscribe a marcher ou pas
+                case "SubscribeAnswer":
+                    result = messageArray[1].Equals("True");
+                    Container.GetA<LoginViewModel>().SubscribeCallback(result);
+                    break;
+                //EditProfileAnswer -> recu pour savoir si le l'edition a marcher ou pas
+                case "EditProfileAnswer":
+                    result = messageArray[1].Equals("True");
+                    Container.GetA<EditProfileViewModel>().EditProfileCallback(result);
+                    break;
                 default:
                     throw new Exception("Commande '" + commandType + "' non reconnue.");
             }
-            receiveDone.Set();
         }
 
         private static void Send(string commandType, string data)
