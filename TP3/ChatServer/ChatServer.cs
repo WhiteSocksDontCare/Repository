@@ -369,6 +369,7 @@ namespace ChatServer
         {
             var profile = profiles.Find(x => x.Pseudo == newProfile.Pseudo);
             profiles[profiles.IndexOf(profile)] = newProfile;
+            onlineClients[socket] = newProfile;
             Send(socket, "Info", "Le profile a été mis à jour");
             Send(socket, "EditProfileAnswer", "True");
         }
@@ -397,7 +398,7 @@ namespace ChatServer
                 LeaveRoom(handler, onlineClients[handler].IDRoom);
 
             //create a new room and affect only name, description and correct ID.
-            if (messages.Count > 0)
+            if (rooms.Count > 0)
                 room.IDRoom = rooms.Max(x => x.IDRoom) + 1;
             else
                 room.IDRoom = 0;
@@ -513,9 +514,9 @@ namespace ChatServer
         private static void UpdateLobby(Socket socket, Profile profile)
         {
             semaphoreLobby.WaitOne();
-            lobby.AllRooms = new ObservableCollection<Room>(rooms);
+            lobby.AllRooms = new ObservableCollection<Room>(rooms.Where(x => !x.IsDeleted));
             lobby.ClientProfile = profile;
-            lobby.OtherUsers = new ObservableCollection<Profile>(onlineClients.Where(x => x.Value != profile).Select(y => y.Value).ToList());
+            lobby.OtherUsers = new ObservableCollection<Profile>(profiles.Where(x => x.Pseudo != profile.Pseudo));
             Send(socket, "UpdateLobby", lobby.Serialize());
             semaphoreLobby.Release();
         }
