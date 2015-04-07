@@ -199,11 +199,12 @@ namespace ChatClient
             // Read data from the client socket. 
             var bytesRead = handler.EndReceive(ar);
 
-            if (bytesRead > 0)
-            {
-                // There might be more data, so store the data received so far.
-                state.sb.Append(Encoding.ASCII.GetString(state.Buffer, 0, bytesRead));
+            
+            // There might be more data, so store the data received so far.
+            state.sb.Append(Encoding.ASCII.GetString(state.Buffer, 0, bytesRead));
 
+            if (bytesRead >= StateObject.BufferSize)
+            {    
                 // Get the rest of the data.
                 client.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReceiveCallback), state);
             }

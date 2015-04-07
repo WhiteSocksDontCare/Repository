@@ -28,7 +28,8 @@ namespace ChatServer
 
     class ChatServer : IDisposable
     {
-        private static double UPDATE_INTERVAL = 30000;  //Intervale de temps entre deux mises à jour des lobbys vers les clients (30 secondes)
+        //Jajoute un 0 pour pas se faire spammer en debug
+        private static double UPDATE_INTERVAL = 300000;  //Intervale de temps entre deux mises à jour des lobbys vers les clients (30 secondes)
         private static double SAVE_INTERVAL = 600000;  //Intervale de temps entre deux save des listes dans le fichier XML (10 minutes)
         private static string PROFILES_FILE = "profiles.xml";
         private static string ROOMS_FILE = "rooms.xml";
@@ -304,15 +305,15 @@ namespace ChatServer
         {
             if (users.Find(x => x.Pseudo == user.Pseudo && x.Password == user.Password) == null)
             {
-                Send(socket, "LoginAnswer", "False");
                 Send(socket, "Error", "Nom d'usager ou mot de passe invalide");
+                Send(socket, "LoginAnswer", "False");
                 return;
             }
 
             var profile = profiles.Find(x => x.Pseudo == user.Pseudo);
             onlineClients[socket] = profile;
-            Send(socket, "LoginAnswer", "True");
             UpdateLobby(socket, profile);
+            Send(socket, "LoginAnswer", "True");
         }
 
         /// <summary>
@@ -325,15 +326,16 @@ namespace ChatServer
         {
             if (users.Find(x => x.Pseudo == user.Pseudo) != null)
             {
-                Send(socket, "SubscribeAnswer", "False");
                 Send(socket, "Error", "Nom d'usager déjà existant");
+                Send(socket, "SubscribeAnswer", "False");
                 return;
             }
             var bidon = new Profile { Pseudo = user.Pseudo, IDRoom = -1 };
+            profiles.Add(bidon);
             onlineClients[socket] = bidon;
             users.Add(user);
-            Send(socket, "SubscribeAnswer", "True");
             UpdateLobby(socket, bidon);
+            Send(socket, "SubscribeAnswer", "True");
         }
 
         /// <summary>
@@ -346,15 +348,6 @@ namespace ChatServer
         }
 
         /// <summary>
-        /// Ajoute le profile passé en paramètre à la liste profiles
-        /// </summary>
-        /// <param name="profile"></param>
-        private static void CreateProfile(Profile profile)
-        {
-            profiles.Add(profile);
-        }
-
-        /// <summary>
         /// Trouve le profil correspondant au nom du nouveau profil dans la liste de profil
         /// et affecte le profil modifié
         /// </summary>
@@ -364,8 +357,8 @@ namespace ChatServer
         {
             var profile = profiles.Find(x => x.Pseudo == newProfile.Pseudo);
             profiles[profiles.IndexOf(profile)] = newProfile;
-            Send(socket, "EditProfileAnswer", "True");
             Send(socket, "Info", "Le profile a été mis à jour");
+            Send(socket, "EditProfileAnswer", "True");
         }
 
         /// <summary>
