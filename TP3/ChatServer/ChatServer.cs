@@ -304,12 +304,14 @@ namespace ChatServer
         {
             if (users.Find(x => x.Pseudo == user.Pseudo && x.Password == user.Password) == null)
             {
+                Send(socket, "LoginAnswer", "False");
                 Send(socket, "Error", "Nom d'usager ou mot de passe invalide");
                 return;
             }
 
             var profile = profiles.Find(x => x.Pseudo == user.Pseudo);
             onlineClients[socket] = profile;
+            Send(socket, "LoginAnswer", "True");
             UpdateLobby(socket, profile);
         }
 
@@ -321,11 +323,17 @@ namespace ChatServer
         /// <param name="user"></param>
         private static void Subscribe(Socket socket, User user)
         {
+            if (users.Find(x => x.Pseudo == user.Pseudo) != null)
+            {
+                Send(socket, "SubscribeAnswer", "False");
+                Send(socket, "Error", "Nom d'usager déjà existant");
+                return;
+            }
             var bidon = new Profile { Pseudo = user.Pseudo, IDRoom = -1 };
             onlineClients[socket] = bidon;
             users.Add(user);
+            Send(socket, "SubscribeAnswer", "True");
             UpdateLobby(socket, bidon);
-            //Send(handler, "UpdateLobby", bidon.Serialize());
         }
 
         /// <summary>
@@ -356,6 +364,7 @@ namespace ChatServer
         {
             var profile = profiles.Find(x => x.Pseudo == newProfile.Pseudo);
             profiles[profiles.IndexOf(profile)] = newProfile;
+            Send(socket, "EditProfileAnswer", "True");
             Send(socket, "Info", "Le profile a été mis à jour");
         }
 
