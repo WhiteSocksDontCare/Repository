@@ -126,6 +126,19 @@ namespace ChatClient
             }
         }
 
+        public static void ViewProfile(string Pseudo)
+        {
+            try
+            {
+                Send("ViewProfile", Pseudo);
+                sendDone.WaitOne();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+
         public static bool DisconnectClient()
         {
             try
@@ -233,12 +246,13 @@ namespace ChatClient
                 //UpdateRoom -> Recu seulement quand le client est dans une room
                 case "UpdateRoom":
                     Room room = messageArray[1].Deserialize<Room>();
-                    Container.GetA<RoomViewModel>().Room = room;
+                    Container.GetA<LobbyViewModel>().RoomViewModel.Room = room;
                     break;
                 //UpdateProfile -> recu dans le cas d'une consultation de profil (sois-meme ou autre)
-                case "UpdateProfile":
+                case "ViewProfile":
                     Profile profile = messageArray[1].Deserialize<Profile>();
-                    // TODO : Afficher le profil reçu.
+                    Container.GetA<ViewProfileViewModel>().Profile = profile;
+                    Container.GetA<LobbyViewModel>().ViewProfileCallback();
                     break;
                 //LoginAnswer -> recu pour savoir si le login a marcher ou pas
                 case "LoginAnswer":

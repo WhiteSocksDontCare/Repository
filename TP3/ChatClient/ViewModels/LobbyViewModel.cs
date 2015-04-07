@@ -59,10 +59,16 @@ namespace ChatClient.ViewModels
 
         public void EditProfile()
         {
+            Container.GetA<EditProfileViewModel>().Profile = Lobby.ClientProfile;
             Container.GetA<MainViewModel>().NavigateToView(Container.GetA<EditProfileViewModel>());
         }
 
         public void ViewProfile()
+        {
+            Client.ViewProfile(Lobby.ClientProfile.Pseudo);
+        }
+
+        public void ViewProfileCallback()
         {
             Container.GetA<MainViewModel>().NavigateToView(Container.GetA<ViewProfileViewModel>());
         }
