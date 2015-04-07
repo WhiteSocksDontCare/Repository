@@ -8,6 +8,10 @@ using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
 using System.Windows.Input;
 using MVVM.Container;
+using System.Windows.Forms;
+using System.Windows.Controls;
+using System.Windows.Media.Imaging;
+using System.IO;
 
 namespace ChatClient.ViewModels
 {
@@ -17,7 +21,7 @@ namespace ChatClient.ViewModels
 
         public EditProfileViewModel()
         {
-            BrowseCommand = new DelegateCommand(BrowseImage);
+            BrowseCommand = new DelegateCommand<object>(BrowseImage);
             CancelCommand = new DelegateCommand(CancelModification);
             SaveCommand = new DelegateCommand(SaveModification);
             _profile = new Profile();
@@ -33,9 +37,19 @@ namespace ChatClient.ViewModels
         public ICommand SaveCommand { get; private set; }
         public ICommand BrowseCommand { get; private set; }
 
-        public void BrowseImage()
+        public void BrowseImage(object imageControl)
         {
-            //TODO: Browse an image.
+            OpenFileDialog fileDialog = new OpenFileDialog();
+            fileDialog.Filter = "Image Files(*.jpg; *.jpeg; *.gif; *.bmp; *.png)|*.jpg; *.jpeg; *.gif; *.bmp; *.png";
+            if (fileDialog.ShowDialog() == DialogResult.OK)
+            {
+                BitmapImage image = new BitmapImage();
+                image.BeginInit();
+                image.UriSource = new Uri(fileDialog.FileName);
+                image.EndInit();
+                ((Image)imageControl).Source = image;
+                //Profile.Avatar = image;
+            }
         }
 
         public void SaveModification()
