@@ -71,6 +71,11 @@ namespace ChatServer
             disposed = true;
         }
 
+        ~ChatServer()
+        {
+            Dispose();
+        }
+
         public static void LoadServerInfos()
         {
             List<Profile> tempProfiles;
@@ -262,6 +267,8 @@ namespace ChatServer
                     throw new Exception();
             }
             Console.WriteLine(commandType);
+            handler.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
+                ReadCallback, state);
         }
 
         public static void Send(Socket handler, string commandType, string data)
