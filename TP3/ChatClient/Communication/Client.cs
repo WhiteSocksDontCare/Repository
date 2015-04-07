@@ -152,6 +152,32 @@ namespace ChatClient
             }
         }
 
+        public static void SendMessage(Message message)
+        {
+            try
+            {
+                Send("SendMessage", message.Serialize());
+                sendDone.WaitOne();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+
+        public static void LeaveRoom(int roomID)
+        {
+            try
+            {
+                Send("LeaveRoom", roomID.ToString());
+                sendDone.WaitOne();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+
         public static bool DisconnectClient()
         {
             try

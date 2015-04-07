@@ -10,25 +10,43 @@
     </UserControl.Resources>
     <Grid d:DataContext="{StaticResource DesignViewModel}" Margin="0,0,0,-0.2">
 
-        <TextBox HorizontalAlignment="Left"
+        <ListView HorizontalAlignment="Left"
                  Height="235"
                  Margin="13,73,0,0"
-                 TextWrapping="Wrap"
-                 Text="TextBox"
                  VerticalAlignment="Top"
-                 Width="266" />
+                 Width="266"
+                  ItemsSource="{Binding Room.Messages, UpdateSourceTrigger=PropertyChanged}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <WrapPanel>
+                        <TextBlock Text="{Binding Text}"></TextBlock>
+                    </WrapPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
 
         <ListView HorizontalAlignment="Left"
                   Margin="287,73,0,0"
                   VerticalAlignment="Top"
                   Height="235"
-                  Width="143" />
+                  Width="143"
+                  ItemsSource="{Binding Room.SubscribedUsers, UpdateSourceTrigger=PropertyChanged}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <WrapPanel>
+                        <Image></Image>
+                        <TextBlock Text="{Binding Pseudo}"></TextBlock>
+                    </WrapPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
 
-        <TextBox HorizontalAlignment="Left"
+        <TextBox Name="Message"
+                 HorizontalAlignment="Left"
                  Height="49"
                  Margin="13,313,0,0"
                  TextWrapping="Wrap"
-                 Text="TextBox"
+                 Text="{Binding Message.Text}"
                  VerticalAlignment="Top"
                  Width="266" />
 
@@ -43,7 +61,7 @@
         <Button Content="Quitter salle"
                 Command="{Binding LeaveRoomCommand}"
                 HorizontalAlignment="Left"
-                Margin="334,10,0,0"
+                Margin="334,37,0,0"
                 VerticalAlignment="Top"
                 Width="96"
                 Height="31" />

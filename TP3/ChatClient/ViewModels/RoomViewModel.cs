@@ -13,6 +13,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using ChatClient.Utils;
+using System.Windows.Controls;
 
 namespace ChatClient.ViewModels
 {
@@ -20,6 +21,7 @@ namespace ChatClient.ViewModels
     {
 
         private Room _room;
+        private Message _message;
         private readonly Lazy<ObservableCollection<MessageViewModel>> _messages;
         private readonly Lazy<ObservableCollection<ProfileViewModel>> _subscribedUsers;
 
@@ -58,6 +60,11 @@ namespace ChatClient.ViewModels
             get { return _room; }
             set { SetProperty(ref _room, value); }
         }
+        public Message Message
+        {
+            get { return _message; }
+            set { SetProperty(ref _message, value); }
+        }
 
 
         public ICommand LeaveRoomCommand { get; private set; }
@@ -66,12 +73,12 @@ namespace ChatClient.ViewModels
 
         public void LeaveRoom()
         {
-            //TODO: Cacher l'envoie de message
+            Client.LeaveRoom(Room.IDRoom);
         }
 
         public void SendMessage()
         {
-            //TODO: Envoyer le message
+            Client.SendMessage(Message);
         }
     }
 }
