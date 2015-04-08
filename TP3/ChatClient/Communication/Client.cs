@@ -68,7 +68,7 @@ namespace ChatClient
                 }
                 else
                 {
-                    MessageBox.Show("Timeout: No answer from the server", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Timeout: No answer from the server", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     client = null;
                     return false;
                 }
@@ -103,7 +103,7 @@ namespace ChatClient
                 Send("Login", user.Serialize());
                 if (!sendDone.WaitOne(TIMEOUT))
                 {
-                    MessageBox.Show("Timeout: No answer from the server", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Timeout: No answer from the server", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                     
             }
@@ -120,8 +120,13 @@ namespace ChatClient
                 Send("Subscribe", user.Serialize());
                 if (!sendDone.WaitOne(TIMEOUT))
                 {
-                    MessageBox.Show("Timeout: No answer from the server", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Timeout: No answer from the server", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
+            }
+            catch (SocketException sEx)
+            {
+                MessageBox.Show("Connection timed out", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                Console.WriteLine(sEx.ToString());
             }
             catch (Exception ex)
             {
@@ -293,7 +298,7 @@ namespace ChatClient
                     case "Error":
                         response = false;
                         var messageError = messageArray[1];
-                        MessageBox.Show(messageError, "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show(messageError, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         break;
                     //UpdateLobby -> cas general. recu en tout temps; profil vide lors de la creation
                     case "UpdateLobby":
