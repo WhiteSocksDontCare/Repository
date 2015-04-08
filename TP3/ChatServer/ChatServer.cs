@@ -336,7 +336,8 @@ namespace ChatServer
 
             var profile = profiles.Find(x => x.Pseudo == user.Pseudo);
             onlineClients[socket] = profile;
-            UpdateLobby(socket, profile);
+            UpdateAllLobby();
+            //UpdateLobby(socket, profile);
             Send(socket, CommandType.LoginAnswer, "True");
         }
 
@@ -369,8 +370,7 @@ namespace ChatServer
         private static void Logout(Socket socket)
         {
             onlineClients.Remove(socket);
-            foreach(var client in onlineClients)
-                UpdateLobby(client.Key, client.Value);
+            UpdateAllLobby();
         }
 
         /// <summary>
@@ -420,7 +420,8 @@ namespace ChatServer
             rooms.Add(room);
             //put the user in this room => updateRoom and updateLobby
             JoinRoom(handler, room.IDRoom);
-            UpdateLobby(handler, onlineClients[handler]);
+            UpdateAllLobby();
+            //UpdateLobby(handler, onlineClients[handler]);
         }
 
         /// <summary>
@@ -450,7 +451,11 @@ namespace ChatServer
             var room = rooms.Find(x => x.IDRoom == idRoom);
             room.SubscribedUsers.Remove(onlineClients[handler]);
             if (room.SubscribedUsers.Count <= 0)
+            {
                 room.IsDeleted = true;
+                UpdateAllLobby();
+            }
+                
 
             onlineClients[handler].IDRoom = -1;
         }
@@ -527,6 +532,11 @@ namespace ChatServer
             }
         }
 
+        private static void UpdateAllLobby()
+        {
+            foreach (var client in onlineClients)
+                Send(client.Key, CommandType.UpdateLobby, lobby.Serialize());
+        }
         private static void UpdateLobby(Socket socket, Profile profile)
         {
             semaphoreLobby.WaitOne();
