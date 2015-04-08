@@ -431,7 +431,11 @@ namespace ChatServer
             onlineClients[socket].IDRoom = idRoom;
             var room = rooms.Find(x => x.IDRoom == idRoom);
             room.SubscribedUsers.Add(onlineClients[socket]);
-            Send(socket, CommandType.UpdateRoom, room.Serialize());
+            foreach(var profile in room.SubscribedUsers)
+            {
+                var s = onlineClients.FirstOrDefault(x => x.Value == profile).Key;
+                Send(s, CommandType.UpdateRoom, room.Serialize()); 
+            }
         }
 
         /// <summary>
