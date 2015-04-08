@@ -29,6 +29,7 @@ namespace ChatClient
     public class Client
     {
         private const int port = 11000;
+        private const int TIMEOUT = 10000;
 
         private static readonly ManualResetEvent connectDone = new ManualResetEvent(false);
         private static readonly ManualResetEvent sendDone = new ManualResetEvent(false);
@@ -57,12 +58,20 @@ namespace ChatClient
                 client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 
                 client.BeginConnect(remoteEP, ConnectCallback, client);
-                connectDone.WaitOne();
 
-                threadlisten = new Thread(new ThreadStart(listening));
-                threadlisten.Start();
+                if (connectDone.WaitOne(TIMEOUT))
+                {
+                    threadlisten = new Thread(new ThreadStart(listening));
+                    threadlisten.Start();
 
-                return true;
+                    return true;
+                }
+                else
+                {
+                    MessageBox.Show("Timeout: No answer from the server", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                    client = null;
+                    return false;
+                }
             }
              catch (Exception ex)
              {
@@ -92,7 +101,11 @@ namespace ChatClient
             try
             {
                 Send("Login", user.Serialize());
-                sendDone.WaitOne();
+                if (!sendDone.WaitOne(TIMEOUT))
+                {
+                    MessageBox.Show("Timeout: No answer from the server", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                    
             }
             catch (Exception ex)
             {
@@ -105,7 +118,10 @@ namespace ChatClient
             try
             {
                 Send("Subscribe", user.Serialize());
-                sendDone.WaitOne();
+                if (!sendDone.WaitOne(TIMEOUT))
+                {
+                    MessageBox.Show("Timeout: No answer from the server", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
             catch (Exception ex)
             {
