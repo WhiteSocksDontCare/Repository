@@ -524,7 +524,7 @@ namespace ChatServer
                 }
             }
 
-            List<Socket> listSockets = onlineClients.Where(x => room.SubscribedUsers.All(p => p == x.Value)).Select(x => x.Key).ToList();
+            List<Socket> listSockets = onlineClients.Where(x => room.SubscribedUsers.Any(p => p == x.Value)).Select(x => x.Key).ToList();
 
             foreach (var socket in listSockets)
             {
