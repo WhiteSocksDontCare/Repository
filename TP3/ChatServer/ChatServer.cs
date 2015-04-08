@@ -66,10 +66,9 @@ namespace ChatServer
             foreach (var client in onlineClients)
             {
                 client.Key.Shutdown(SocketShutdown.Both);
-            client.Key.Disconnect(false);
+                client.Key.Disconnect(false);
                 client.Key.Close();
             }
-
             ChatCommunication.SerializerHelper.SerializeToXML(profiles, PROFILES_FILE);
             ChatCommunication.SerializerHelper.SerializeToXML(rooms, ROOMS_FILE);
             ChatCommunication.SerializerHelper.SerializeToXML(likes, LIKES_FILE);
@@ -199,14 +198,14 @@ namespace ChatServer
 
             if (bytesRead >= StateObject.BufferSize)
             {
-                 //Get the rest of the data.
+                //Get the rest of the data.
                 handler.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReadCallback), state);
             }
             else
             {
                 if (state.sb.Length > 1)
                     ProcessRequest(state, handler);
-            }            
+            }
         }
 
         private static void ProcessRequest(StateObject state, Socket socket)
@@ -224,22 +223,22 @@ namespace ChatServer
                 {
                     case CommandType.Login:
                         {
-                        TryConnect(socket, messageArray[1].Deserialize<User>());
+                            TryConnect(socket, messageArray[1].Deserialize<User>());
                             break;
                         }
                     case CommandType.Subscribe:
                         {
-                        Subscribe(socket, messageArray[1].Deserialize<User>());
+                            Subscribe(socket, messageArray[1].Deserialize<User>());
                             break;
                         }
                     case CommandType.Logout:
                         {
-                        Logout(socket);
+                            Logout(socket);
                             break;
                         }
-                    case CommandType.EditProfile:
+                    case "EditProfile":
                         {
-                        EditProfile(socket, messageArray[1].Deserialize<Profile>());
+                            EditProfile(socket, messageArray[1].Deserialize<Profile>());
                             break;
                         }
                     case CommandType.ViewProfile:
@@ -254,13 +253,13 @@ namespace ChatServer
                         }
                     case CommandType.JoinRoom:
                         {
-                        JoinRoom(socket, Convert.ToInt32(messageArray[1]));
+                            JoinRoom(socket, Convert.ToInt32(messageArray[1]));
                             break;
                         }
                     case CommandType.LeaveRoom:
                         {
-                        LeaveRoom(socket, Convert.ToInt32(messageArray[1]));
-                        UpdateLobby(socket, onlineClients[socket]);
+                            LeaveRoom(socket, Convert.ToInt32(messageArray[1]));
+                            UpdateLobby(socket, onlineClients[socket]);
                             break;
                         }
                     case CommandType.SendMessage:
@@ -319,14 +318,14 @@ namespace ChatServer
         private static void TryConnect(Socket socket, User user)
         {
             foreach (var pair in onlineClients)
-	        {
+            {
                 if (user.Pseudo == ((Profile)pair.Value).Pseudo)
                 {
                     Send(socket, CommandType.Error, "Usager déjà connecté ailleur");
                     Send(socket, CommandType.LoginAnswer, "False");
                     return;
                 }
-	        }
+            }
 
             if (users.Find(x => x.Pseudo == user.Pseudo && x.Password == user.Password) == null)
             {
@@ -383,11 +382,9 @@ namespace ChatServer
         private static void EditProfile(Socket socket, Profile newProfile)
         {
             var profile = profiles.Find(x => x.Pseudo == newProfile.Pseudo);
-            //profiles[profiles.IndexOf(profile)] = newProfile;
-            //onlineClients[socket].Avatar = newProfile.Avatar;
-            onlineClients[socket].FirstName = newProfile.FirstName;
-            onlineClients[socket].LastName = newProfile.LastName;
-            Send(socket, CommandType.Info, "Le profil a été mis à jour");
+            profiles[profiles.IndexOf(profile)] = newProfile;
+            onlineClients[socket] = newProfile;
+            Send(socket, CommandType.Info, "Le profile a été mis à jour");
             Send(socket, CommandType.EditProfileAnswer, "True");
         }
 
@@ -437,12 +434,11 @@ namespace ChatServer
             onlineClients[socket].IDRoom = idRoom;
             var room = rooms.Find(x => x.IDRoom == idRoom);
             room.SubscribedUsers.Add(onlineClients[socket]);
-            foreach(var profile in room.SubscribedUsers)
+            foreach (var profile in room.SubscribedUsers)
             {
                 var s = onlineClients.FirstOrDefault(x => x.Value == profile).Key;
-                Send(s, CommandType.UpdateRoom, room.Serialize()); 
+                Send(s, CommandType.UpdateRoom, room.Serialize());
             }
-            UpdateLobby(socket, onlineClients[socket]);
         }
 
         /// <summary>
@@ -459,7 +455,7 @@ namespace ChatServer
                 room.IsDeleted = true;
                 UpdateAllLobby();
             }
-                
+
 
             onlineClients[handler].IDRoom = -1;
         }
@@ -528,7 +524,7 @@ namespace ChatServer
                 }
             }
 
-            List<Socket> listSockets = onlineClients.Where(x => room.SubscribedUsers.Any(p => p == x.Value)).Select(x => x.Key).ToList();
+            List<Socket> listSockets = onlineClients.Where(x => room.SubscribedUsers.All(p => p == x.Value)).Select(x => x.Key).ToList();
 
             foreach (var socket in listSockets)
             {
@@ -539,7 +535,7 @@ namespace ChatServer
         private static void UpdateAllLobby()
         {
             foreach (var client in onlineClients)
-                Send(client.Key, CommandType.UpdateLobby, lobby.Serialize());
+                UpdateLobby(client.Key, client.Value);
         }
         private static void UpdateLobby(Socket socket, Profile profile)
         {

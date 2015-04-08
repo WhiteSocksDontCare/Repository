@@ -342,6 +342,7 @@ namespace ChatClient
                     //LoginAnswer -> recu pour savoir si le login a marcher ou pas
                     case CommandType.LoginAnswer:
                         result = messageArray[1].Equals("True");
+                        //Container.GetA<EditProfileViewModel>().Profile = Container.GetA<LobbyViewModel>().Lobby.ClientProfile;
                         Container.GetA<LoginViewModel>().LoginCallback(result);
                         break;
                     //SubscribeAnswer -> recu pour savoir si le Subscribe a marcher ou pas
