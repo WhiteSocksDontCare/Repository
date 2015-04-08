@@ -369,6 +369,8 @@ namespace ChatServer
         private static void Logout(Socket socket)
         {
             onlineClients.Remove(socket);
+            foreach(var client in onlineClients)
+                UpdateLobby(client.Key, client.Value);
         }
 
         /// <summary>
