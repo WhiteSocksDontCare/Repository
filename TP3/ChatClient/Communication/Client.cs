@@ -29,6 +29,7 @@ namespace ChatClient
     public class Client
     {
         private const int port = 11000;
+        private const int TIMEOUT = 10000;
 
         private static readonly ManualResetEvent connectDone = new ManualResetEvent(false);
         private static readonly ManualResetEvent sendDone = new ManualResetEvent(false);
@@ -58,12 +59,20 @@ namespace ChatClient
                 client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 
                 client.BeginConnect(remoteEP, ConnectCallback, client);
-                connectDone.WaitOne();
 
-                threadlisten = new Thread(new ThreadStart(Listening));
+                if (connectDone.WaitOne(TIMEOUT))
+                {
+                    threadlisten = new Thread(new ThreadStart(Listening));
                 threadlisten.Start();
 
                 return true;
+            }
+                else
+                {
+                    MessageBox.Show("Timeout: No answer from the server", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    client = null;
+                    return false;
+                }
             }
              catch (Exception ex)
              {
@@ -93,7 +102,11 @@ namespace ChatClient
             try
             {
                 Send(CommandType.Login, user.Serialize());
-                sendDone.WaitOne();
+                if (!sendDone.WaitOne(TIMEOUT))
+                {
+                    MessageBox.Show("Timeout: No answer from the server", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                    
             }
             catch (Exception ex)
             {
@@ -107,7 +120,15 @@ namespace ChatClient
             try
             {
                 Send(CommandType.Subscribe, user.Serialize());
-                sendDone.WaitOne();
+                if (!sendDone.WaitOne(TIMEOUT))
+                {
+                    MessageBox.Show("Timeout: No answer from the server", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            catch (SocketException sEx)
+            {
+                MessageBox.Show("Connection timed out", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                Console.WriteLine(sEx.ToString());
             }
             catch (Exception ex)
             {
@@ -304,7 +325,7 @@ namespace ChatClient
                         break;
                     //SubscribeAnswer -> recu pour savoir si le Subscribe a marcher ou pas
                     case CommandType.SubscribeAnswer:
-                        result = messageArray[1].Equals("True");                 
+                        result = messageArray[1].Equals("True");
                         Container.GetA<EditProfileViewModel>().Profile = Container.GetA<LobbyViewModel>().Lobby.ClientProfile;
                         Container.GetA<LoginViewModel>().SubscribeCallback(result);
                         break;
