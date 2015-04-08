@@ -55,6 +55,7 @@ namespace ChatClient.ViewModels
 
         public void Disconnect()
         {
+            Client.DisconnectClient();
             Container.GetA<MainViewModel>().NavigateToView(Container.GetA<LoginViewModel>());
         }
 

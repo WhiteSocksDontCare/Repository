@@ -205,11 +205,13 @@ namespace ChatClient
         {
             try
             {
+                Send(CommandType.Logout, "");
                 client.Shutdown(SocketShutdown.Both);
-                client.Disconnect(true);
+                client.Disconnect(false);
                 threadlisten.Abort();
                 threadlisten.Join();
                 client.Close();
+                client = null;
                 return true;
             }
             catch (Exception ex)
@@ -255,8 +257,14 @@ namespace ChatClient
         {
             // Retrieve the state object and the handler socket
             // from the asynchronous state object.
+            
             var state = (StateObject)ar.AsyncState;
             var handler = state.WorkSocket;
+
+            if (!handler.Connected)
+            {
+                return;
+            }
 
             // Read data from the client socket. 
             var bytesRead = handler.EndReceive(ar);
