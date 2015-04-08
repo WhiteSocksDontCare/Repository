@@ -38,17 +38,11 @@
                   Height="140"
                   Width="143" 
                   ItemsSource="{Binding Lobby.AllRooms, UpdateSourceTrigger=PropertyChanged}">
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <WrapPanel>
-                        <TextBlock Text="{Binding Name}"></TextBlock> 
-                        <Button Content="Join" Command="{Binding JoinCommand}"></Button>
-                    </WrapPanel>
-                </DataTemplate>
-            </ListView.ItemTemplate>
             <ListView.Resources>
                 <ContextMenu x:Key="ItemContextMenu">
-                    <MenuItem Header="More Info" Command="{Binding JoinCommand}" Background="WhiteSmoke" />
+                    <MenuItem Header="Join Room" 
+                              Command="{Binding Path=DataContext.JoinRoomCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}"
+                              CommandParameter="{Binding}" />
                 </ContextMenu>
             </ListView.Resources>
 
@@ -57,6 +51,24 @@
                     <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
                 </Style>
             </ListView.ItemContainerStyle>
+
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <WrapPanel>
+                        <TextBlock Text="{Binding Name}" />
+                    </WrapPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+            <!--<ListView.ItemTemplate>
+                <DataTemplate>
+                    <WrapPanel>
+                        <TextBlock Text="{Binding Name}" FontWeight="Bold" />
+                        <Button Command="{Binding RelativeSource={RelativeSource FindAncestor,AncestorType={x:Type ListView}},Path=DataContext.JoinRoomCommand}" 
+                                CommandParameter="{Binding}" 
+                                Content="{Binding Path=Name}"/>
+                    </WrapPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>-->
         </ListView>
 
         <Button Content="Déconnecter"

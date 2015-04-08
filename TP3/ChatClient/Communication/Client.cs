@@ -175,6 +175,19 @@ namespace ChatClient
             }
         }
 
+        public static void JoinRoom(int roomID)
+        {
+            try
+            {
+                Send(CommandType.JoinRoom, roomID.ToString());
+                sendDone.WaitOne();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+
         public static void SendMessage(Message message)
         {
             try
