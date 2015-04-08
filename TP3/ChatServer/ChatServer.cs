@@ -57,18 +57,19 @@ namespace ChatServer
             {
                 _listener.Close();
                 _listener = null;
-        }
+            }
             catch (Exception e)
-        {
+            {
                 Console.WriteLine(e.ToString());
             }
 
-                foreach (var client in onlineClients)
-                {
-                    client.Key.Shutdown(SocketShutdown.Both);
-                client.Key.Disconnect(false);
-                    client.Key.Close();
-                }
+            foreach (var client in onlineClients)
+            {
+                client.Key.Shutdown(SocketShutdown.Both);
+            client.Key.Disconnect(false);
+                client.Key.Close();
+            }
+
             ChatCommunication.SerializerHelper.SerializeToXML(profiles, PROFILES_FILE);
             ChatCommunication.SerializerHelper.SerializeToXML(rooms, ROOMS_FILE);
             ChatCommunication.SerializerHelper.SerializeToXML(likes, LIKES_FILE);
@@ -236,7 +237,7 @@ namespace ChatServer
                         Logout(socket);
                             break;
                         }
-                    case "EditProfile":
+                    case CommandType.EditProfile:
                         {
                         EditProfile(socket, messageArray[1].Deserialize<Profile>());
                             break;
@@ -380,9 +381,11 @@ namespace ChatServer
         private static void EditProfile(Socket socket, Profile newProfile)
         {
             var profile = profiles.Find(x => x.Pseudo == newProfile.Pseudo);
-            profiles[profiles.IndexOf(profile)] = newProfile;
-            onlineClients[socket] = newProfile;
-            Send(socket, CommandType.Info, "Le profile a été mis à jour");
+            //profiles[profiles.IndexOf(profile)] = newProfile;
+            //onlineClients[socket].Avatar = newProfile.Avatar;
+            onlineClients[socket].FirstName = newProfile.FirstName;
+            onlineClients[socket].LastName = newProfile.LastName;
+            Send(socket, CommandType.Info, "Le profil a été mis à jour");
             Send(socket, CommandType.EditProfileAnswer, "True");
         }
 
@@ -436,6 +439,7 @@ namespace ChatServer
                 var s = onlineClients.FirstOrDefault(x => x.Value == profile).Key;
                 Send(s, CommandType.UpdateRoom, room.Serialize()); 
             }
+            UpdateLobby(socket, onlineClients[socket]);
         }
 
         /// <summary>
@@ -517,7 +521,7 @@ namespace ChatServer
                 }
             }
 
-            List<Socket> listSockets = onlineClients.Where(x => room.SubscribedUsers.All(p => p == x.Value)).Select(x => x.Key).ToList();
+            List<Socket> listSockets = onlineClients.Where(x => room.SubscribedUsers.Any(p => p == x.Value)).Select(x => x.Key).ToList();
 
             foreach (var socket in listSockets)
             {

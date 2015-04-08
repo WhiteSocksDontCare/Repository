@@ -19,8 +19,16 @@
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <WrapPanel>
-                        <TextBlock Text="{Binding Text}"></TextBlock>
-                        <Button Content="Like"></Button>
+                        <TextBlock>
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="{}{0} : {1} (Likes: {2}, Dislikes: {3})">
+                                    <Binding Path="Pseudo" />
+                                    <Binding Path="Text" />
+                                    <Binding Path="NbLike" />
+                                    <Binding Path="NbDislike" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
                     </WrapPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>

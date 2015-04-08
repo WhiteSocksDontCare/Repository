@@ -82,7 +82,7 @@ namespace ChatClient.ViewModels
             Message.IDRoom = Room.IDRoom;
             Message.Pseudo = Container.GetA<LobbyViewModel>().Lobby.ClientProfile.Pseudo;
             Client.SendMessage(Message);
-            Message.Text = "";
+            //Message.Text = "";
         }
     }
 }
