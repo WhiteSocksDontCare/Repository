@@ -28,7 +28,7 @@ namespace ChatServer
         public StringBuilder sb = new StringBuilder();
     }
 
-    class ChatServer : IDisposable
+    class ChatServer //: IDisposable
     {
         //Jajoute un 0 pour pas se faire spammer en debug
         private static double UPDATE_INTERVAL = 100000;  //Intervale de temps entre deux mises à jour des lobbys vers les clients (30 secondes)
@@ -39,8 +39,7 @@ namespace ChatServer
         private static string USERS_FILE = "users.xml";
 
         private static Semaphore semaphoreLobby = new Semaphore(1, 1);
-
-        private static int i = 0;
+        private static Socket _listener;
         public static ManualResetEvent AllDone = new ManualResetEvent(false);
         private static Dictionary<Socket, Profile> onlineClients = new Dictionary<Socket, Profile>();
 
@@ -52,30 +51,28 @@ namespace ChatServer
         private static Lobby lobby = new Lobby();
         private bool disposed = true;
 
-        public void Dispose()
+        public static void CleanUp()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposed)
-                return;
-            if (disposing)
+            try
             {
-                foreach (var client in onlineClients)
-                {
-                    client.Key.Shutdown(SocketShutdown.Both);
-                    client.Key.Close();
-                }
+                _listener.Close();
+                _listener = null;
             }
-            disposed = true;
-        }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
 
-        ~ChatServer()
-        {
-            Dispose();
+            foreach (var client in onlineClients)
+            {
+                client.Key.Shutdown(SocketShutdown.Both);
+                client.Key.Disconnect(false);
+                client.Key.Close();
+            }
+            ChatCommunication.SerializerHelper.SerializeToXML(profiles, PROFILES_FILE);
+            ChatCommunication.SerializerHelper.SerializeToXML(rooms, ROOMS_FILE);
+            ChatCommunication.SerializerHelper.SerializeToXML(likes, LIKES_FILE);
+            ChatCommunication.SerializerHelper.SerializeToXML(users, USERS_FILE);
         }
 
         public static void LoadServerInfos()
@@ -128,7 +125,7 @@ namespace ChatServer
 
         public static void UpdateLobbyTimerElapsed(object source, ElapsedEventArgs e)
         {
-            foreach(KeyValuePair<Socket, Profile> client in onlineClients)
+            foreach (KeyValuePair<Socket, Profile> client in onlineClients)
                 UpdateLobby(client.Key, client.Value);
         }
 
@@ -138,23 +135,25 @@ namespace ChatServer
             IPAddress ipAddress = null;
             foreach (var addr in Dns.GetHostEntry(string.Empty).AddressList.Where(addr => addr.AddressFamily == AddressFamily.InterNetwork))
             {
-                ipAddress=addr;
+                ipAddress = addr;
             }
             var localEndPoint = new IPEndPoint(ipAddress, 11000);
 
-            var listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            _listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
             try
             {
-                listener.Bind(localEndPoint);
-                listener.Listen(100);
+                _listener.Bind(localEndPoint);
+                _listener.Listen(100);
 
                 while (true)
                 {
                     AllDone.Reset();
 
                     Console.WriteLine("Waiting for someone...");
-                    listener.BeginAccept(AcceptCallback, listener);
+                    if (_listener == null)
+                        return;
+                    _listener.BeginAccept(AcceptCallback, _listener);
                     AllDone.WaitOne();
                 }
             }
@@ -170,7 +169,8 @@ namespace ChatServer
         public static void AcceptCallback(IAsyncResult ar)
         {
             AllDone.Set();
-
+            if (_listener == null)
+                return;
             var listener = (Socket)ar.AsyncState;
             var handler = listener.EndAccept(ar);
 
@@ -187,6 +187,9 @@ namespace ChatServer
             var state = (StateObject)ar.AsyncState;
             var handler = state.WorkSocket;
 
+            if (!handler.Connected)
+                return;
+
             // Read data from the client socket. 
             var bytesRead = handler.EndReceive(ar);
 
@@ -195,14 +198,14 @@ namespace ChatServer
 
             if (bytesRead >= StateObject.BufferSize)
             {
-                 //Get the rest of the data.
+                //Get the rest of the data.
                 handler.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReadCallback), state);
             }
             else
             {
                 if (state.sb.Length > 1)
                     ProcessRequest(state, handler);
-            }            
+            }
         }
 
         private static void ProcessRequest(StateObject state, Socket socket)
@@ -220,22 +223,22 @@ namespace ChatServer
                 {
                     case CommandType.Login:
                         {
-                        TryConnect(socket, messageArray[1].Deserialize<User>());
+                            TryConnect(socket, messageArray[1].Deserialize<User>());
                             break;
                         }
                     case CommandType.Subscribe:
                         {
-                        Subscribe(socket, messageArray[1].Deserialize<User>());
+                            Subscribe(socket, messageArray[1].Deserialize<User>());
                             break;
                         }
                     case CommandType.Logout:
                         {
-                        Logout(socket);
+                            Logout(socket);
                             break;
                         }
                     case "EditProfile":
                         {
-                        EditProfile(socket, messageArray[1].Deserialize<Profile>());
+                            EditProfile(socket, messageArray[1].Deserialize<Profile>());
                             break;
                         }
                     case CommandType.ViewProfile:
@@ -250,13 +253,13 @@ namespace ChatServer
                         }
                     case CommandType.JoinRoom:
                         {
-                        JoinRoom(socket, Convert.ToInt32(messageArray[1]));
+                            JoinRoom(socket, Convert.ToInt32(messageArray[1]));
                             break;
                         }
                     case CommandType.LeaveRoom:
                         {
-                        LeaveRoom(socket, Convert.ToInt32(messageArray[1]));
-                        UpdateLobby(socket, onlineClients[socket]);
+                            LeaveRoom(socket, Convert.ToInt32(messageArray[1]));
+                            UpdateLobby(socket, onlineClients[socket]);
                             break;
                         }
                     case CommandType.SendMessage:
