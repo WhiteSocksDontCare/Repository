@@ -31,7 +31,7 @@ namespace ChatServer
     class ChatServer : IDisposable
     {
         //Jajoute un 0 pour pas se faire spammer en debug
-        private static double UPDATE_INTERVAL = 300000;  //Intervale de temps entre deux mises à jour des lobbys vers les clients (30 secondes)
+        private static double UPDATE_INTERVAL = 100000;  //Intervale de temps entre deux mises à jour des lobbys vers les clients (30 secondes)
         private static double SAVE_INTERVAL = 600000;  //Intervale de temps entre deux save des listes dans le fichier XML (10 minutes)
         private static string PROFILES_FILE = "profiles.xml";
         private static string ROOMS_FILE = "rooms.xml";
@@ -200,93 +200,93 @@ namespace ChatServer
             else
             {
                 if (state.sb.Length > 1)
-                {
-                    var data = state.sb.ToString();
-                    var messageArray = data.Split(new[] { '!' }, 2);
-                    var commandType = messageArray[0];
-
-                    switch (commandType)
-                    {
-                        case "Login":
-                            {
-                                TryConnect(handler, messageArray[1].Deserialize<User>());
-                                break;
-                            }
-                        case "Subscribe":
-                            {
-                                Subscribe(handler, messageArray[1].Deserialize<User>());
-                                break;
-                            }
-                        case "Logout":
-                            {
-                                Logout(handler);
-                                break;
-                            }
-                        //case "CreateProfile":
-                        //    {
-                        //        var profile = messageArray[1].Deserialize<Profile>();
-                        //        CreateProfile(profile);
-                        //        UpdateLobby(handler, profile);
-                        //        break;
-                        //    }
-                        case "EditProfile":
-                            {
-                                EditProfile(handler, messageArray[1].Deserialize<Profile>());
-                                break;
-                            }
-                        case "ViewProfile":
-                            {
-                                ViewProfile(handler, messageArray[1]);
-
-                                break;
-                            }
-                        case "CreateRoom":
-                            {
-                                CreateRoom(handler, messageArray[1].Deserialize<Room>());
-
-                                break;
-                            }
-                        case "JoinRoom":
-                            {
-                                JoinRoom(handler, Convert.ToInt32(messageArray[1]));
-                                break;
-                            }
-                        case "LeaveRoom":
-                            {
-                                LeaveRoom(handler, Convert.ToInt32(messageArray[1]));
-                                UpdateLobby(handler, onlineClients[handler]);
-                                break;
-                            }
-                        case "SendMessage":
-                            {
-                                SendMessage(messageArray[1].Deserialize<Message>());
-                                break;
-                            }
-                        case "DeleteMessage":
-                            {
-                                DeleteMessage(messageArray[1].Deserialize<Message>());
-                                break;
-                            }
-                        case "SendLike":
-                            {
-                                SendLike(messageArray[1].Deserialize<Like>());
-                                break;
-                            }
-                        default:
-                            throw new Exception();
-                    }
-                    Console.WriteLine(commandType);
-                    state.sb.Clear();
-                    handler.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
-                        ReadCallback, state);
-                    
-                }
+                    ProcessRequest(state, handler);
             }            
+        }
+
+        private static void ProcessRequest(StateObject state, Socket socket)
+        {
+            var data = state.sb.ToString();
+            // EOR = end of request
+            var messages = data.Split(new string[] { "<EOR>" }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var message in messages)
+            {
+                var messageArray = message.Split(new char[] { '!' }, 2);
+                var commandType = messageArray[0];
+
+                switch (commandType)
+                {
+                    case "Login":
+                        {
+                            TryConnect(socket, messageArray[1].Deserialize<User>());
+                            break;
+                        }
+                    case "Subscribe":
+                        {
+                            Subscribe(socket, messageArray[1].Deserialize<User>());
+                            break;
+                        }
+                    case "Logout":
+                        {
+                            Logout(socket);
+                            break;
+                        }
+                    case "EditProfile":
+                        {
+                            EditProfile(socket, messageArray[1].Deserialize<Profile>());
+                            break;
+                        }
+                    case "ViewProfile":
+                        {
+                            ViewProfile(socket, messageArray[1]);
+
+                            break;
+                        }
+                    case "CreateRoom":
+                        {
+                            CreateRoom(socket, messageArray[1].Deserialize<Room>());
+
+                            break;
+                        }
+                    case "JoinRoom":
+                        {
+                            JoinRoom(socket, Convert.ToInt32(messageArray[1]));
+                            break;
+                        }
+                    case "LeaveRoom":
+                        {
+                            LeaveRoom(socket, Convert.ToInt32(messageArray[1]));
+                            UpdateLobby(socket, onlineClients[socket]);
+                            break;
+                        }
+                    case "SendMessage":
+                        {
+                            SendMessage(messageArray[1].Deserialize<Message>());
+                            break;
+                        }
+                    case "DeleteMessage":
+                        {
+                            DeleteMessage(messageArray[1].Deserialize<Message>());
+                            break;
+                        }
+                    case "SendLike":
+                        {
+                            SendLike(messageArray[1].Deserialize<Like>());
+                            break;
+                        }
+                    default:
+                        throw new Exception();
+                }
+            }
+            state.sb.Clear();
+            socket.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
+                ReadCallback, state);
         }
 
         public static void Send(Socket handler, string commandType, string data)
         {
-            data = commandType + "!" + data;
+            data = commandType + "!" + data + "<EOR>";
             var byteData = Encoding.ASCII.GetBytes(data);
 
             handler.BeginSend(byteData, 0, byteData.Length, 0, SendCallback, handler);
