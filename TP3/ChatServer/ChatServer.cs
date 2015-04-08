@@ -28,11 +28,11 @@ namespace ChatServer
         public StringBuilder sb = new StringBuilder();
     }
 
-    class ChatServer //: IDisposable
+    class ChatServer
     {
         //Jajoute un 0 pour pas se faire spammer en debug
-        private static double UPDATE_INTERVAL = 100000;  //Intervale de temps entre deux mises à jour des lobbys vers les clients (30 secondes)
-        private static double SAVE_INTERVAL = 600000;  //Intervale de temps entre deux save des listes dans le fichier XML (10 minutes)
+        private static double UPDATE_INTERVAL = 100000;  //Intervalle de temps entre deux mises à jour des lobbys vers les clients (30 secondes)
+        private static double SAVE_INTERVAL = 600000;  //Intervalle de temps entre deux save des listes dans le fichier XML (10 minutes)
         private static string PROFILES_FILE = "profiles.xml";
         private static string ROOMS_FILE = "rooms.xml";
         private static string LIKES_FILE = "likes.xml";
@@ -65,6 +65,7 @@ namespace ChatServer
 
             foreach (var client in onlineClients)
             {
+                client.Value.IsConnected = false;
                 client.Key.Shutdown(SocketShutdown.Both);
                 client.Key.Disconnect(false);
                 client.Key.Close();
@@ -236,7 +237,7 @@ namespace ChatServer
                             Logout(socket);
                             break;
                         }
-                    case "EditProfile":
+                    case CommandType.EditProfile:
                         {
                             EditProfile(socket, messageArray[1].Deserialize<Profile>());
                             break;
@@ -336,6 +337,7 @@ namespace ChatServer
 
             var profile = profiles.Find(x => x.Pseudo == user.Pseudo);
             onlineClients[socket] = profile;
+            onlineClients[socket].IsConnected = true;
             UpdateAllLobby();
             //UpdateLobby(socket, profile);
             Send(socket, CommandType.LoginAnswer, "True");
@@ -355,7 +357,7 @@ namespace ChatServer
                 Send(socket, CommandType.SubscribeAnswer, "False");
                 return;
             }
-            var bidon = new Profile { Pseudo = user.Pseudo, IDRoom = -1 };
+            var bidon = new Profile { Pseudo = user.Pseudo, IDRoom = -1, IsConnected= true };
             profiles.Add(bidon);
             onlineClients[socket] = bidon;
             users.Add(user);
@@ -369,6 +371,7 @@ namespace ChatServer
         /// <param name="socket"></param>
         private static void Logout(Socket socket)
         {
+            onlineClients[socket].IsConnected = false;
             onlineClients.Remove(socket);
             UpdateAllLobby();
         }
@@ -404,14 +407,10 @@ namespace ChatServer
         /// <summary>
         /// Ajoute la salle à la liste et retourne la salle
         /// </summary>
-        /// <param name="handler"></param>
+        /// <param name="socket"></param>
         /// <param name="room"></param>
-        private static void CreateRoom(Socket handler, Room room)
+        private static void CreateRoom(Socket socket, Room room)
         {
-            //leave room if he is already in one and create a new one
-            if (onlineClients[handler].IDRoom != -1)
-                LeaveRoom(handler, onlineClients[handler].IDRoom);
-
             //create a new room and affect only name, description and correct ID.
             if (rooms.Count > 0)
                 room.IDRoom = rooms.Max(x => x.IDRoom) + 1;
@@ -420,7 +419,7 @@ namespace ChatServer
 
             rooms.Add(room);
             //put the user in this room => updateRoom and updateLobby
-            JoinRoom(handler, room.IDRoom);
+            JoinRoom(socket, room.IDRoom);
             UpdateAllLobby();
             //UpdateLobby(handler, onlineClients[handler]);
         }
@@ -432,8 +431,12 @@ namespace ChatServer
         /// <param name="idRoom"></param>
         private static void JoinRoom(Socket socket, int idRoom)
         {
-            onlineClients[socket].IDRoom = idRoom;
+            //leave room if he is already in one and create a new one
+            if (onlineClients[socket].IDRoom != -1)
+                LeaveRoom(socket, onlineClients[socket].IDRoom);
+
             var room = rooms.Find(x => x.IDRoom == idRoom);
+            onlineClients[socket].IDRoom = idRoom;            
             room.SubscribedUsers.Add(onlineClients[socket]);
             foreach (var profile in room.SubscribedUsers)
             {
@@ -456,8 +459,6 @@ namespace ChatServer
                 room.IsDeleted = true;
                 UpdateAllLobby();
             }
-
-
             onlineClients[handler].IDRoom = -1;
         }
 
