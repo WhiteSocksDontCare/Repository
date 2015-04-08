@@ -15,11 +15,12 @@
                  Margin="13,73,0,0"
                  VerticalAlignment="Top"
                  Width="266"
-                  ItemsSource="{Binding Room.Messages, UpdateSourceTrigger=PropertyChanged}">
+                 ItemsSource="{Binding Room.Messages, UpdateSourceTrigger=PropertyChanged}">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <WrapPanel>
                         <TextBlock Text="{Binding Text}"></TextBlock>
+                        <Button Content="Like"></Button>
                     </WrapPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>
@@ -46,7 +47,7 @@
                  Height="49"
                  Margin="13,313,0,0"
                  TextWrapping="Wrap"
-                 Text="{Binding Message.Text}"
+                 Text="{Binding Message.Text, Mode=TwoWay}"
                  VerticalAlignment="Top"
                  Width="266" />
 

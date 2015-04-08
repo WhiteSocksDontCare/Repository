@@ -19,7 +19,6 @@ namespace ChatClient.ViewModels
 {
     class RoomViewModel : BindableBase
     {
-
         private Room _room;
         private Message _message;
         private readonly Lazy<ObservableCollection<MessageViewModel>> _messages;
@@ -28,8 +27,7 @@ namespace ChatClient.ViewModels
         public RoomViewModel()
         {
             LeaveRoomCommand = new DelegateCommand(LeaveRoom);
-            SendMessageCommand = new DelegateCommand(SendMessage);
-            _room = new Room();
+            SendMessageCommand = new DelegateCommand(SendMessage);            
 
             //Alex: test de creation d'une ObservableCollection sync entre la vue et le model
             //_messages
@@ -43,6 +41,9 @@ namespace ChatClient.ViewModels
             Func<ObservableCollection<ProfileViewModel>> profileCollectionCreator =
                 () => new ObservableViewModelCollection<ProfileViewModel, Profile>(Room.SubscribedUsers, profileViewModelCreator);
             _subscribedUsers = new Lazy<ObservableCollection<ProfileViewModel>>(profileCollectionCreator);
+
+            _room = new Room();
+            _message = new Message();
         }
 
         public ObservableCollection<MessageViewModel> MessageViewModels
@@ -78,7 +79,10 @@ namespace ChatClient.ViewModels
 
         public void SendMessage()
         {
+            Message.IDRoom = Room.IDRoom;
+            Message.Pseudo = Container.GetA<LobbyViewModel>().Lobby.ClientProfile.Pseudo;
             Client.SendMessage(Message);
+            Message.Text = "";
         }
     }
 }

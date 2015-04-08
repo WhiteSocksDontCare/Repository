@@ -12,7 +12,6 @@ namespace ChatClient.ViewModels
 {
     class MessageViewModel : BindableBase
     {
-
         private Message _message;
 
         public MessageViewModel()
