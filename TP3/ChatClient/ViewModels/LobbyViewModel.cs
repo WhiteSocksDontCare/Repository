@@ -10,13 +10,16 @@ using System.Windows.Input;
 using ChatCommunication;
 using Microsoft.Practices.Prism.Commands;
 using MVVM.Container;
+using System.Collections.ObjectModel;
+using ChatClient.Utils;
 
 namespace ChatClient.ViewModels
 {
     class LobbyViewModel : BindableBase
     {
         private Lobby _lobby;
-        private Profile _userProfile;
+        //private Profile _userProfile;
+        private readonly Lazy<ObservableCollection<RoomItemViewModel>> _roomItems;
         private RoomViewModel _roomViewModel;
 
 
@@ -26,9 +29,14 @@ namespace ChatClient.ViewModels
             EditProfileCommand = new DelegateCommand(EditProfile);
             ViewProfileCommand = new DelegateCommand(ViewProfile);
             CreateRoomCommand = new DelegateCommand(CreateRoom);
-
+            
             _lobby = new Lobby();
             _roomViewModel = new RoomViewModel();
+
+            Func<Room, RoomItemViewModel> roomItemsViewModelCreator = model => new RoomItemViewModel() { RoomItem = model };
+            Func<ObservableCollection<RoomItemViewModel>> roomItemsCollectionCreator =
+                () => new ObservableViewModelCollection<RoomItemViewModel, Room>(Lobby.AllRooms, roomItemsViewModelCreator);
+            _roomItems = new Lazy<ObservableCollection<RoomItemViewModel>>(roomItemsCollectionCreator);
         }
 
 
@@ -55,6 +63,7 @@ namespace ChatClient.ViewModels
 
         public void Disconnect()
         {
+            Client.DisconnectClient();
             Container.GetA<MainViewModel>().NavigateToView(Container.GetA<LoginViewModel>());
         }
 
@@ -79,6 +88,5 @@ namespace ChatClient.ViewModels
             Container.GetA<CreateRoomViewModel>().Room = new Room();
             Container.GetA<MainViewModel>().NavigateToView(Container.GetA<CreateRoomViewModel>());
         }
-
     }
 }

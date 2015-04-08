@@ -57,18 +57,18 @@ namespace ChatServer
             {
                 _listener.Close();
                 _listener = null;
-            }
+        }
             catch (Exception e)
-            {
+        {
                 Console.WriteLine(e.ToString());
             }
 
-            foreach (var client in onlineClients)
-            {
-                client.Key.Shutdown(SocketShutdown.Both);
+                foreach (var client in onlineClients)
+                {
+                    client.Key.Shutdown(SocketShutdown.Both);
                 client.Key.Disconnect(false);
-                client.Key.Close();
-            }
+                    client.Key.Close();
+                }
             ChatCommunication.SerializerHelper.SerializeToXML(profiles, PROFILES_FILE);
             ChatCommunication.SerializerHelper.SerializeToXML(rooms, ROOMS_FILE);
             ChatCommunication.SerializerHelper.SerializeToXML(likes, LIKES_FILE);
@@ -198,14 +198,14 @@ namespace ChatServer
 
             if (bytesRead >= StateObject.BufferSize)
             {
-                //Get the rest of the data.
+                 //Get the rest of the data.
                 handler.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReadCallback), state);
             }
             else
             {
                 if (state.sb.Length > 1)
                     ProcessRequest(state, handler);
-            }
+            }            
         }
 
         private static void ProcessRequest(StateObject state, Socket socket)
@@ -223,22 +223,22 @@ namespace ChatServer
                 {
                     case CommandType.Login:
                         {
-                            TryConnect(socket, messageArray[1].Deserialize<User>());
+                        TryConnect(socket, messageArray[1].Deserialize<User>());
                             break;
                         }
                     case CommandType.Subscribe:
                         {
-                            Subscribe(socket, messageArray[1].Deserialize<User>());
+                        Subscribe(socket, messageArray[1].Deserialize<User>());
                             break;
                         }
                     case CommandType.Logout:
                         {
-                            Logout(socket);
+                        Logout(socket);
                             break;
                         }
                     case "EditProfile":
                         {
-                            EditProfile(socket, messageArray[1].Deserialize<Profile>());
+                        EditProfile(socket, messageArray[1].Deserialize<Profile>());
                             break;
                         }
                     case CommandType.ViewProfile:
@@ -253,13 +253,13 @@ namespace ChatServer
                         }
                     case CommandType.JoinRoom:
                         {
-                            JoinRoom(socket, Convert.ToInt32(messageArray[1]));
+                        JoinRoom(socket, Convert.ToInt32(messageArray[1]));
                             break;
                         }
                     case CommandType.LeaveRoom:
                         {
-                            LeaveRoom(socket, Convert.ToInt32(messageArray[1]));
-                            UpdateLobby(socket, onlineClients[socket]);
+                        LeaveRoom(socket, Convert.ToInt32(messageArray[1]));
+                        UpdateLobby(socket, onlineClients[socket]);
                             break;
                         }
                     case CommandType.SendMessage:
@@ -317,6 +317,16 @@ namespace ChatServer
         /// <param name="user"></param>
         private static void TryConnect(Socket socket, User user)
         {
+            foreach (var pair in onlineClients)
+	        {
+                if (user.Pseudo == ((Profile)pair.Value).Pseudo)
+                {
+                    Send(socket, CommandType.Error, "Usager déjà connecté ailleur");
+                    Send(socket, CommandType.LoginAnswer, "False");
+                    return;
+                }
+	        }
+
             if (users.Find(x => x.Pseudo == user.Pseudo && x.Password == user.Password) == null)
             {
                 Send(socket, CommandType.Error, "Nom d'usager ou mot de passe invalide");
