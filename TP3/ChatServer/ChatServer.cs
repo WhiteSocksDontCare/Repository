@@ -96,6 +96,7 @@ namespace ChatServer
             if ((tempUsers = ChatCommunication.SerializerHelper.DeserializeFromXML<List<User>>(USERS_FILE)) != null)
                 users = tempUsers;
         }
+
         public static void ServerInfosTimer()
         {
             System.Timers.Timer saveTimer = new System.Timers.Timer(SAVE_INTERVAL);
@@ -202,72 +203,63 @@ namespace ChatServer
                 if (state.sb.Length > 1)
                 {
                     var data = state.sb.ToString();
-                    var messageArray = data.Split(new[] { '!' }, 2);
+                    var messageArray = data.Split(new[] { General.CommandDelim }, 2);
                     var commandType = messageArray[0];
 
                     switch (commandType)
                     {
-                        case "Login":
+                        case CommandType.Login:
                             {
                                 TryConnect(handler, messageArray[1].Deserialize<User>());
                                 break;
                             }
-                        case "Subscribe":
+                        case CommandType.Subscribe:
                             {
                                 Subscribe(handler, messageArray[1].Deserialize<User>());
                                 break;
                             }
-                        case "Logout":
+                        case CommandType.Logout:
                             {
                                 Logout(handler);
                                 break;
                             }
-                        //case "CreateProfile":
-                        //    {
-                        //        var profile = messageArray[1].Deserialize<Profile>();
-                        //        CreateProfile(profile);
-                        //        UpdateLobby(handler, profile);
-                        //        break;
-                        //    }
-                        case "EditProfile":
+                        case CommandType.EditProfile:
                             {
                                 EditProfile(handler, messageArray[1].Deserialize<Profile>());
                                 break;
                             }
-                        case "ViewProfile":
+                        case CommandType.ViewProfile:
                             {
                                 ViewProfile(handler, messageArray[1]);
-
                                 break;
                             }
-                        case "CreateRoom":
+                        case CommandType.CreateRoom:
                             {
                                 CreateRoom(handler, messageArray[1].Deserialize<Room>());
-
                                 break;
                             }
-                        case "JoinRoom":
+                        case CommandType.JoinRoom:
                             {
                                 JoinRoom(handler, Convert.ToInt32(messageArray[1]));
                                 break;
                             }
-                        case "LeaveRoom":
+                        case CommandType.LeaveRoom:
                             {
                                 LeaveRoom(handler, Convert.ToInt32(messageArray[1]));
                                 UpdateLobby(handler, onlineClients[handler]);
                                 break;
                             }
-                        case "SendMessage":
+                        case CommandType.SendMessage:
                             {
                                 SendMessage(messageArray[1].Deserialize<Message>());
                                 break;
                             }
-                        case "DeleteMessage":
+                        case CommandType.DeleteMessage:
                             {
                                 DeleteMessage(messageArray[1].Deserialize<Message>());
                                 break;
                             }
-                        case "SendLike":
+                        case CommandType.SendLike:
                             {
                                 SendLike(messageArray[1].Deserialize<Like>());
                                 break;
@@ -286,7 +278,7 @@ namespace ChatServer
 
         public static void Send(Socket handler, string commandType, string data)
         {
-            data = commandType + "!" + data;
+            data = commandType + General.CommandDelim + data;
             var byteData = Encoding.ASCII.GetBytes(data);
 
             handler.BeginSend(byteData, 0, byteData.Length, 0, SendCallback, handler);
@@ -317,15 +309,15 @@ namespace ChatServer
         {
             if (users.Find(x => x.Pseudo == user.Pseudo && x.Password == user.Password) == null)
             {
-                Send(socket, "Error", "Nom d'usager ou mot de passe invalide");
-                Send(socket, "LoginAnswer", "False");
+                Send(socket, CommandType.Error, "Nom d'usager ou mot de passe invalide");
+                Send(socket, CommandType.LoginAnswer, "False");
                 return;
             }
 
             var profile = profiles.Find(x => x.Pseudo == user.Pseudo);
             onlineClients[socket] = profile;
             UpdateLobby(socket, profile);
-            Send(socket, "LoginAnswer", "True");
+            Send(socket, CommandType.LoginAnswer, "True");
         }
 
         /// <summary>
@@ -338,8 +330,8 @@ namespace ChatServer
         {
             if (users.Find(x => x.Pseudo == user.Pseudo) != null)
             {
-                Send(socket, "Error", "Nom d'usager déjà existant");
-                Send(socket, "SubscribeAnswer", "False");
+                Send(socket, CommandType.Error, "Nom d'usager déjà existant");
+                Send(socket, CommandType.SubscribeAnswer, "False");
                 return;
             }
             var bidon = new Profile { Pseudo = user.Pseudo, IDRoom = -1 };
@@ -347,7 +339,7 @@ namespace ChatServer
             onlineClients[socket] = bidon;
             users.Add(user);
             UpdateLobby(socket, bidon);
-            Send(socket, "SubscribeAnswer", "True");
+            Send(socket, CommandType.SubscribeAnswer, "True");
         }
 
         /// <summary>
@@ -370,8 +362,8 @@ namespace ChatServer
             var profile = profiles.Find(x => x.Pseudo == newProfile.Pseudo);
             profiles[profiles.IndexOf(profile)] = newProfile;
             onlineClients[socket] = newProfile;
-            Send(socket, "Info", "Le profile a été mis à jour");
-            Send(socket, "EditProfileAnswer", "True");
+            Send(socket, CommandType.Info, "Le profile a été mis à jour");
+            Send(socket, CommandType.EditProfileAnswer, "True");
         }
 
         /// <summary>
@@ -383,7 +375,7 @@ namespace ChatServer
         {
             var profile = profiles.Find(x => x.Pseudo == username);
             var serializedProfile = profile.Serialize();
-            Send(socket, "ViewProfile", serializedProfile);
+            Send(socket, CommandType.ViewProfile, serializedProfile);
         }
 
         /// <summary>
@@ -419,7 +411,7 @@ namespace ChatServer
             onlineClients[socket].IDRoom = idRoom;
             var room = rooms.Find(x => x.IDRoom == idRoom);
             room.SubscribedUsers.Add(onlineClients[socket]);
-            Send(socket, "UpdateRoom", room.Serialize());
+            Send(socket, CommandType.UpdateRoom, room.Serialize());
         }
 
         /// <summary>
@@ -435,8 +427,6 @@ namespace ChatServer
                 room.IsDeleted = true;
 
             onlineClients[handler].IDRoom = -1;
-
-            //Send();
         }
 
         /// <summary>
@@ -507,7 +497,7 @@ namespace ChatServer
 
             foreach (var socket in listSockets)
             {
-                Send(socket, "UpdateRoom", room.Serialize());
+                Send(socket, CommandType.UpdateRoom, room.Serialize());
             }
         }
 
@@ -517,7 +507,7 @@ namespace ChatServer
             lobby.AllRooms = new ObservableCollection<Room>(rooms.Where(x => !x.IsDeleted));
             lobby.ClientProfile = profile;
             lobby.OtherUsers = new ObservableCollection<Profile>(profiles.Where(x => x.Pseudo != profile.Pseudo));
-            Send(socket, "UpdateLobby", lobby.Serialize());
+            Send(socket, CommandType.UpdateLobby, lobby.Serialize());
             semaphoreLobby.Release();
         }
     }
