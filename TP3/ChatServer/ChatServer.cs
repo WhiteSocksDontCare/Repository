@@ -382,8 +382,9 @@ namespace ChatServer
         private static void EditProfile(Socket socket, Profile newProfile)
         {
             var profile = profiles.Find(x => x.Pseudo == newProfile.Pseudo);
-            profiles[profiles.IndexOf(profile)] = newProfile;
-            onlineClients[socket] = newProfile;
+            //profiles[profiles.IndexOf(profile)] = newProfile;
+            onlineClients[socket].FirstName = newProfile.FirstName;
+            onlineClients[socket].LastName = newProfile.LastName;
             Send(socket, CommandType.Info, "Le profile a été mis à jour");
             Send(socket, CommandType.EditProfileAnswer, "True");
         }
