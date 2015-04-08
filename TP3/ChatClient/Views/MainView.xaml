@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:VM="clr-namespace:ChatClient.ViewModels" 
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="482" d:DesignWidth="604">
     <UserControl.Resources>
         <VM:MainViewModel x:Key="DesignViewModel" />
     </UserControl.Resources>

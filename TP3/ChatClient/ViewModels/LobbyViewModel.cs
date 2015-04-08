@@ -12,6 +12,7 @@ using Microsoft.Practices.Prism.Commands;
 using MVVM.Container;
 using System.Collections.ObjectModel;
 using ChatClient.Utils;
+using System.Windows.Forms;
 
 namespace ChatClient.ViewModels
 {
@@ -19,9 +20,10 @@ namespace ChatClient.ViewModels
     {
         private Lobby _lobby;
         //private Profile _userProfile;
-        private readonly Lazy<ObservableCollection<RoomItemViewModel>> _roomItems;
+        //private readonly Lazy<ObservableCollection<RoomItemViewModel>> _roomItems;
         private RoomViewModel _roomViewModel;
 
+        
 
         public LobbyViewModel()
         {
@@ -29,14 +31,16 @@ namespace ChatClient.ViewModels
             EditProfileCommand = new DelegateCommand(EditProfile);
             ViewProfileCommand = new DelegateCommand(ViewProfile);
             CreateRoomCommand = new DelegateCommand(CreateRoom);
+
+            this.JoinRoomCommand = new DelegateCommand<Room>(JoinRoom);
             
             _lobby = new Lobby();
             _roomViewModel = new RoomViewModel();
 
-            Func<Room, RoomItemViewModel> roomItemsViewModelCreator = model => new RoomItemViewModel() { RoomItem = model };
-            Func<ObservableCollection<RoomItemViewModel>> roomItemsCollectionCreator =
-                () => new ObservableViewModelCollection<RoomItemViewModel, Room>(Lobby.AllRooms, roomItemsViewModelCreator);
-            _roomItems = new Lazy<ObservableCollection<RoomItemViewModel>>(roomItemsCollectionCreator);
+            //Func<Room, RoomItemViewModel> roomItemsViewModelCreator = model => new RoomItemViewModel() { RoomItem = model };
+            //Func<ObservableCollection<RoomItemViewModel>> roomItemsCollectionCreator =
+            //    () => new ObservableViewModelCollection<RoomItemViewModel, Room>(Lobby.AllRooms, roomItemsViewModelCreator);
+            //_roomItems = new Lazy<ObservableCollection<RoomItemViewModel>>(roomItemsCollectionCreator);
         }
 
 
@@ -56,10 +60,12 @@ namespace ChatClient.ViewModels
             //True si l'user a pas -1 et si on a recu la bonne room dans le updateRoom!
             get { return Lobby.ClientProfile.IDRoom != -1 && Lobby.ClientProfile.IDRoom == RoomViewModel.Room.IDRoom; }
         }
+
         public ICommand DisconnectCommand { get; private set; }
         public ICommand EditProfileCommand { get; private set; }
         public ICommand ViewProfileCommand { get; private set; }
         public ICommand CreateRoomCommand { get; private set; }
+        public ICommand JoinRoomCommand { get; private set; }
 
         public void Disconnect()
         {
@@ -88,5 +94,10 @@ namespace ChatClient.ViewModels
             Container.GetA<CreateRoomViewModel>().Room = new Room();
             Container.GetA<MainViewModel>().NavigateToView(Container.GetA<CreateRoomViewModel>());
         }
+
+        public void JoinRoom(Room room)
+        {
+            Client.JoinRoom(room.IDRoom);
+        }
     }
-}
+}   
