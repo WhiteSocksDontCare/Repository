@@ -30,7 +30,7 @@ namespace ChatCommunication
             }
             catch (Exception ex)
             {
-                throw new Exception("An error occurred during serialization.", ex);
+                Console.Out.WriteLine("An error occurred during serialization.\n" + ex.Message);
             }
             finally
             {
@@ -55,7 +55,7 @@ namespace ChatCommunication
             }
             catch (Exception ex)
             {
-                throw new Exception("An error occurred during deserialization.", ex);
+                Console.Out.WriteLine("An error occurred during deserialization.\n" + ex.Message);
             }
             finally
             {
@@ -78,7 +78,7 @@ namespace ChatCommunication
             }
             catch (Exception ex)
             {
-                //throw new Exception("An error occurred during serialization into file" + fileName + ".", ex);
+                Console.Out.WriteLine("An error occurred during serialization to XML file " + fileName + ".\n" + ex.Message);
             }
             finally
             {
@@ -101,7 +101,7 @@ namespace ChatCommunication
             }
             catch (Exception ex)
             {
-                //throw new Exception("An error occurred during deserialization from file" + fileName + ".", ex);
+                Console.Out.WriteLine("An error occurred during deserialization from XML file " + fileName + ".\n" + ex.Message);
             }
             finally
             {

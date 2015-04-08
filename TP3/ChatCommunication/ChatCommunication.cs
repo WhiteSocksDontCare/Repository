@@ -35,47 +35,7 @@ namespace ChatCommunication
         public int NbMessage { get; set; }
         public int NbDeletedMessage { get; set; }
         public bool IsConnected { get; set; }
-
-        [XmlIgnore]
-        public BitmapSource Avatar { get; set; }
-
-        [XmlElement("Avatar")]
-        public byte[] ImageBuffer
-        {
-            get
-            {
-                byte[] imageBuffer = null;
-
-                if (Avatar != null)
-                {
-                    using (var stream = new MemoryStream())
-                    {
-                        var encoder = new PngBitmapEncoder(); // or some other encoder
-                        encoder.Frames.Add(BitmapFrame.Create(Avatar));
-                        encoder.Save(stream);
-                        imageBuffer = stream.ToArray();
-                    }
-                }
-
-                return imageBuffer;
-            }
-            set
-            {
-                if (value == null)
-                {
-                    Avatar = null;
-                }
-                else
-                {
-                    using (var stream = new MemoryStream(value))
-                    {
-                        var decoder = BitmapDecoder.Create(stream,
-                            BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
-                        Avatar = decoder.Frames[0];
-                    }
-                }
-            }
-        }
+        public string AvatarUri { get; set; }
     }
 
     public class Room

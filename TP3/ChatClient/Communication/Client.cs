@@ -284,7 +284,7 @@ namespace ChatClient
 
             
             // There might be more data, so store the data received so far.
-            state.sb.Append(Encoding.ASCII.GetString(state.Buffer, 0, bytesRead));
+            state.sb.Append(Encoding.UTF8.GetString(state.Buffer, 0, bytesRead));
 
             if (bytesRead >= StateObject.BufferSize)
             {    
@@ -366,7 +366,7 @@ namespace ChatClient
         {
             // EOR = end of request
             data = commandType + General.CommandDelim + data + General.EOR;
-            var byteData = Encoding.ASCII.GetBytes(data);
+            var byteData = Encoding.UTF8.GetBytes(data);
 
             client.BeginSend(byteData, 0, byteData.Length, 0, SendCallback, client);
         }

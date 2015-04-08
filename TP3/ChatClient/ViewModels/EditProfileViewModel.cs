@@ -48,7 +48,7 @@ namespace ChatClient.ViewModels
                 image.UriSource = new Uri(fileDialog.FileName);
                 image.EndInit();
                 ((Image)imageControl).Source = image;
-                //Profile.Avatar = image;
+                Profile.AvatarUri = fileDialog.FileName;
             }
         }
 

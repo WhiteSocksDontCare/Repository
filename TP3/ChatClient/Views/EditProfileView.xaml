@@ -28,7 +28,8 @@
                Height="103" 
                Margin="155,63,0,0" 
                VerticalAlignment="Top" 
-               Width="117" />
+               Width="117"
+               Source="{Binding Path=Profile.AvatarUri}"/>
         <Button Content="Browse" HorizontalAlignment="Left" Margin="155,171,0,0" VerticalAlignment="Top" Width="75"
                 Command="{Binding BrowseCommand}"
                 CommandParameter="{Binding ElementName=ImgAvatar}"/>
