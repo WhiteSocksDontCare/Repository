@@ -31,8 +31,8 @@ namespace ChatServer
     class ChatServer
     {
         //Jajoute un 0 pour pas se faire spammer en debug
-        private static double UPDATE_INTERVAL = 100000;  //Intervalle de temps entre deux mises à jour des lobbys vers les clients (30 secondes)
-        private static double SAVE_INTERVAL = 120000;  //Intervalle de temps entre deux save des listes dans le fichier XML (2 minutes)
+        private static double UPDATE_INTERVAL = 10000;  //Intervalle de temps entre deux mises à jour des lobbys vers les clients (10 secondes)
+        private static double SAVE_INTERVAL = 90000;  //Intervalle de temps entre deux save des listes dans le fichier XML (1.5 minutes)
         private static string PROFILES_FILE = "profiles.xml";
         private static string ROOMS_FILE = "rooms.xml";
         private static string LIKES_FILE = "likes.xml";
@@ -163,12 +163,11 @@ namespace ChatServer
 
         public static void UpdateLobbyTimerElapsed(object source, ElapsedEventArgs e)
         {
-            _semaphoreOnlineClients.WaitOne();
+            //_semaphoreOnlineClients.WaitOne();
 
-            foreach (KeyValuePair<Socket, Profile> client in _onlineClients)
-                UpdateLobby(client.Key, client.Value);
+            UpdateAllLobby();
 
-            _semaphoreOnlineClients.Release();
+            //_semaphoreOnlineClients.Release();
         }
 
         public static void StartListening()
@@ -444,10 +443,8 @@ namespace ChatServer
             _semaphoreOnlineClients.WaitOne();
             _onlineClients[socket].IsConnected = false;
             _onlineClients.Remove(socket);
-
-            foreach (var client in _onlineClients)
-                UpdateLobby(client.Key, client.Value);
-            _semaphoreOnlineClients.Release();
+            _semaphoreOnlineClients.Release(); 
+            UpdateAllLobby();            
         }
 
         /// <summary>
@@ -516,6 +513,11 @@ namespace ChatServer
         /// <param name="idRoom"></param>
         private static void JoinRoom(Socket socket, int idRoom)
         {
+            if (_onlineClients[socket].IDRoom == idRoom)
+            {
+                return;
+            }
+
             //leave room if he is already in one and create a new one
             _semaphoreOnlineClients.WaitOne();
             int id = _onlineClients[socket].IDRoom ;
@@ -587,7 +589,7 @@ namespace ChatServer
 
             _semaphoreRooms.WaitOne();
             var room = _rooms.Find(x => x.IDRoom == message.IDRoom);
-             // Ajoute à la liste de message
+            // Ajoute à la liste de message
             room.Messages.Add(message);
             UpdateRoom(room);
             _semaphoreRooms.Release();
@@ -673,6 +675,8 @@ namespace ChatServer
             _semaphoreRooms.Release();
 
             _lobby.ClientProfile = profile;
+            _lobby.ClientProfile.NbMessage = _messages.Count(x => x.Pseudo == profile.Pseudo);
+            _lobby.ClientProfile.NbDeletedMessage = _messages.Count(x => x.Pseudo == profile.Pseudo && !x.IsDeleted);
 
             _semaphoreProfiles.WaitOne();
             _lobby.OtherUsers = new ObservableCollection<Profile>(_profiles.Where(x => x.Pseudo != profile.Pseudo));
