@@ -31,8 +31,8 @@ namespace ChatServer
     class ChatServer
     {
         //Jajoute un 0 pour pas se faire spammer en debug
-        private static double UPDATE_INTERVAL = 100000;  //Intervalle de temps entre deux mises à jour des lobbys vers les clients (30 secondes)
-        private static double SAVE_INTERVAL = 600000;  //Intervalle de temps entre deux save des listes dans le fichier XML (10 minutes)
+        private static double UPDATE_INTERVAL = 10000;  //Intervalle de temps entre deux mises à jour des lobbys vers les clients (10 secondes)
+        private static double SAVE_INTERVAL = 90000;  //Intervalle de temps entre deux save des listes dans le fichier XML (1.5 minutes)
         private static string PROFILES_FILE = "profiles.xml";
         private static string ROOMS_FILE = "rooms.xml";
         private static string LIKES_FILE = "likes.xml";
@@ -165,8 +165,7 @@ namespace ChatServer
         {
             //_semaphoreOnlineClients.WaitOne();
 
-            foreach (KeyValuePair<Socket, Profile> client in _onlineClients)
-                UpdateLobby(client.Key, client.Value);
+            UpdateAllLobby();
 
             //_semaphoreOnlineClients.Release();
         }
@@ -436,8 +435,7 @@ namespace ChatServer
             //_semaphoreOnlineClients.WaitOne();
             _onlineClients[socket].IsConnected = false;
             _onlineClients.Remove(socket);
-            foreach (var client in _onlineClients)
-                UpdateLobby(client.Key, client.Value);
+            UpdateAllLobby();
             //_semaphoreOnlineClients.Release();
         }
 
@@ -662,6 +660,8 @@ namespace ChatServer
             //_semaphoreRooms.Release();
 
             _lobby.ClientProfile = profile;
+            _lobby.ClientProfile.NbMessage = _messages.Count(x => x.Pseudo == profile.Pseudo);
+            _lobby.ClientProfile.NbDeletedMessage = _messages.Count(x => x.Pseudo == profile.Pseudo && !x.IsDeleted);
 
             //_semaphoreProfiles.WaitOne();
             _lobby.OtherUsers = new ObservableCollection<Profile>(_profiles.Where(x => x.Pseudo != profile.Pseudo));
