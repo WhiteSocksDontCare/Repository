@@ -509,6 +509,11 @@ namespace ChatServer
         /// <param name="idRoom"></param>
         private static void JoinRoom(Socket socket, int idRoom)
         {
+            if (_onlineClients[socket].IDRoom == idRoom)
+            {
+                return;
+            }
+
             //leave room if he is already in one and create a new one
             if (_onlineClients[socket].IDRoom != -1)
                 LeaveRoom(socket, _onlineClients[socket].IDRoom);
