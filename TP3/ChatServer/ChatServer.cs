@@ -518,10 +518,10 @@ namespace ChatServer
 
             //_semaphoreRooms.WaitOne();
             var room = _rooms.Find(x => x.IDRoom == idRoom);
-            //_semaphoreRooms.Release();
-
-            _onlineClients[socket].IDRoom = idRoom;            
+            _onlineClients[socket].IDRoom = idRoom;
             room.SubscribedUsers.Add(_onlineClients[socket]);
+            UpdateLobby(socket, _onlineClients[socket]);
+            //_semaphoreRooms.Release();            
 
             //_semaphoreOnlineClients.WaitOne();
             foreach (var profile in room.SubscribedUsers)
