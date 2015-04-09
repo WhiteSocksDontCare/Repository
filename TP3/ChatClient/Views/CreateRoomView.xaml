@@ -12,16 +12,16 @@
     </UserControl.Resources>
 
     <Grid d:DataContext="{StaticResource DesignViewModel}">
-        <Label Content="Nom de la salle" HorizontalAlignment="Left" Margin="10,16,0,0" VerticalAlignment="Top"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="10,42,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="193"
+        <Label Content="Name" HorizontalAlignment="Left" Margin="10,16,0,0" VerticalAlignment="Top"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="10,42,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="215"
                  Text="{Binding Room.Name}"/>
         <Label Content="Description" HorizontalAlignment="Left" Margin="10,70,0,0" VerticalAlignment="Top"/>
-        <TextBox HorizontalAlignment="Left" Height="69" Margin="10,96,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="193"
+        <TextBox HorizontalAlignment="Left" Height="69" Margin="10,96,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="215"
                  Text="{Binding Room.Description}"/>
 
-        <Button Content="Cancel" HorizontalAlignment="Left" Margin="0,170,0,0" Padding="5" VerticalAlignment="Top" Width="99"
+        <Button Content="Cancel" HorizontalAlignment="Left" Margin="11,176,0,0" Padding="5" VerticalAlignment="Top" Width="99"
                 Command="{Binding CancelCommand}"/>
-        <Button Content="Save" HorizontalAlignment="Left" Margin="104,170,0,0" Padding="5" VerticalAlignment="Top" Width="99"
+        <Button Content="Save" HorizontalAlignment="Left" Margin="126,176,0,0" Padding="5" VerticalAlignment="Top" Width="99"
                 Command="{Binding SaveCommand}"/>
 
     </Grid>
