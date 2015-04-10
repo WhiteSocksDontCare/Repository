@@ -77,10 +77,10 @@ namespace ChatServer
                 client.Key.Close();
             }
 
-            foreach(var room in _rooms)
-            {
-                room.SubscribedUsers = new ObservableCollection<Profile>();
-            }
+            //foreach (var room in _rooms)
+            //{
+            //    room.SubscribedUsers = new ObservableCollection<Profile>();
+            //}
 
             ServerInfosTimerElapsed(null, null);
         }
@@ -315,7 +315,7 @@ namespace ChatServer
                         }
                     case CommandType.DeleteMessage:
                         {
-                            DeleteMessage(Convert.ToInt32(messageArray[1]));
+                            DeleteMessage(socket, Convert.ToInt32(messageArray[1]));
                             break;
                         }
                     case CommandType.SendLike:
@@ -413,7 +413,7 @@ namespace ChatServer
             {
                 Send(socket, CommandType.Error, "Pseudo already existing");
                 Send(socket, CommandType.SubscribeAnswer, "False");
-                _semaphoreUsers.WaitOne();
+                _semaphoreUsers.Release();
                 return;
             }
             _semaphoreUsers.Release();
@@ -606,10 +606,10 @@ namespace ChatServer
         /// dans le dictionnaire onlineClients. Envoie finalement la salle à tous les sockets trouvés.
         /// </summary>
         /// <param name="message"></param>
-        public static void DeleteMessage(int messageID)
+        public static void DeleteMessage(Socket socket, int messageID)
         {
             _semaphoreMessages.WaitOne();
-            var msg = _messages.Find(x => x.IDMessage == messageID);
+            var msg = _messages.Find(x => x.IDMessage == messageID && x.Pseudo == _onlineClients[socket].Pseudo);
 
             if (msg == null)
             {
@@ -637,7 +637,7 @@ namespace ChatServer
             like.Pseudo = _onlineClients[socket].Pseudo;
             _semaphoreLikes.WaitOne();
 
-            var l = _likes.Find(x => x.Pseudo == like.Pseudo && x.IDMessage == like.IDMessage);
+            var l = _likes.Find(x => x.IDMessage == like.IDMessage &&  x.Pseudo == like.Pseudo);
             if (l == null)
                 _likes.Add(like);
             else
