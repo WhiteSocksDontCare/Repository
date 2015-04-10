@@ -32,6 +32,8 @@ namespace ChatClient.ViewModels
             DislikeCommand = new DelegateCommand<Message>(DislikeMessage);
             DeleteCommand = new DelegateCommand<Message>(DeleteMessage);
 
+            ViewOtherProfileCommand = new DelegateCommand<Profile>(ViewOtherProfile);
+
             ////Alex: test de creation d'une ObservableCollection sync entre la vue et le model
             ////_messages
             //Func<Message, MessageViewModel> messageViewModelCreator = model => new MessageViewModel() { Message = model };
@@ -80,6 +82,7 @@ namespace ChatClient.ViewModels
         public ICommand LikeCommand { get; private set; }
         public ICommand DislikeCommand { get; private set; }
         public ICommand DeleteCommand { get; private set; }
+        public ICommand ViewOtherProfileCommand { get; private set; }
 
 
         public void LeaveRoom()
@@ -92,7 +95,7 @@ namespace ChatClient.ViewModels
             Message.IDRoom = Room.IDRoom;
             Message.Pseudo = Container.GetA<LobbyViewModel>().Lobby.ClientProfile.Pseudo;
             Client.SendMessage(Message);
-            Message.Text = "";
+            Message = new Message();
         }
 
         public void LikeMessage(Message msg)
@@ -110,6 +113,11 @@ namespace ChatClient.ViewModels
         public void DeleteMessage(Message msg)
         {
             Client.DeleteMessage(msg.IDMessage);
+        }
+
+        public void ViewOtherProfile(Profile profile)
+        {
+            Client.ViewProfile(profile.Pseudo);
         }
     }
 }
