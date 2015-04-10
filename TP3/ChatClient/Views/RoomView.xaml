@@ -4,9 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:VM="clr-namespace:ChatClient.ViewModels"
+             xmlns:converters="clr-namespace:ChatClient.Converters"
              mc:Ignorable="d" Height="376.815" Width="455.649">
     <UserControl.Resources>
         <VM:RoomViewModel x:Key="DesignViewModel" />
+        <converters:UserConnectedConverter x:Key="UserConnectedConverter"></converters:UserConnectedConverter>
     </UserControl.Resources>
     <Grid d:DataContext="{StaticResource DesignViewModel}" Margin="0,0,0,-0.2">
 
@@ -58,11 +60,31 @@
                   Height="235"
                   Width="143"
                   ItemsSource="{Binding Room.SubscribedUsers, UpdateSourceTrigger=PropertyChanged}">
+            <ListView.Resources>
+                <ContextMenu x:Key="ItemContextMenu">
+                    <MenuItem Header="View Profile" 
+                              Command="{Binding Path=DataContext.ViewOtherProfileCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}"
+                              CommandParameter="{Binding}" />
+                </ContextMenu>
+            </ListView.Resources>
+
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}" >
+                    <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
+                </Style>
+            </ListView.ItemContainerStyle>
+
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <WrapPanel>
-                        <Image></Image>
-                        <TextBlock Text="{Binding Pseudo}"></TextBlock>
+                        <TextBlock>
+                            <TextBlock.Text>
+                                <MultiBinding Converter="{StaticResource UserConnectedConverter}">
+                                    <Binding Path="Pseudo" />
+                                    <Binding Path="IsConnected" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
                     </WrapPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>

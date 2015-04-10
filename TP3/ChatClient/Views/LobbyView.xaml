@@ -52,14 +52,6 @@
                     </WrapPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>
-            <!--<ListView.ItemTemplate>
-                <DataTemplate>
-                    <WrapPanel>
-                        <Image></Image>
-                        <TextBlock Text="{Binding Pseudo}"></TextBlock>
-                    </WrapPanel>
-                </DataTemplate>
-            </ListView.ItemTemplate>-->
         </ListView>
         <ListView HorizontalAlignment="Left"
                   Margin="10,335,0,0"
