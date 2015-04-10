@@ -400,12 +400,21 @@ namespace ChatServer
 
             _semaphoreProfiles.WaitOne();
             var profile = _profiles.Find(x => x.Pseudo == user.Pseudo);
+            var idRoom = profile.IDRoom;
             _semaphoreProfiles.Release();
 
             _semaphoreOnlineClients.WaitOne();
             _onlineClients[socket] = profile;
             _onlineClients[socket].IsConnected = true;
             _semaphoreOnlineClients.Release();
+          
+            if (idRoom != -1)
+            {
+                _semaphoreRooms.WaitOne();
+                var room = _rooms.Find(x => x.IDRoom == profile.IDRoom);
+                _semaphoreRooms.Release();
+                UpdateRoom(room);
+            }
 
             UpdateAllLobby();
 
