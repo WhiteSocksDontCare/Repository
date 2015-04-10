@@ -374,7 +374,7 @@ namespace ChatServer
             //_semaphoreUsers.WaitOne();
             if (_users.Find(x => x.Pseudo == user.Pseudo && x.Password == user.Password) == null)
             {
-                Send(socket, CommandType.Error, "Nom d'usager ou mot de passe invalide");
+                Send(socket, CommandType.Error, "Invalid pseudo or password.");
                 Send(socket, CommandType.LoginAnswer, "False");
                 return;
             }
@@ -404,7 +404,7 @@ namespace ChatServer
             //_semaphoreUsers.WaitOne();
             if (_users.Find(x => x.Pseudo == user.Pseudo) != null)
             {
-                Send(socket, CommandType.Error, "Nom d'usager déjà existant");
+                Send(socket, CommandType.Error, "Pseudo already existing");
                 Send(socket, CommandType.SubscribeAnswer, "False");
                 return;
             }
@@ -423,7 +423,7 @@ namespace ChatServer
             _users.Add(user);
             //_semaphoreUsers.Release();
 
-            UpdateLobby(socket, bidon);
+            UpdateAllLobby();
             Send(socket, CommandType.SubscribeAnswer, "True");
         }
 
@@ -550,6 +550,10 @@ namespace ChatServer
             {
                 room.IsDeleted = true;
                 UpdateAllLobby();
+            }
+            else
+            {
+                UpdateRoom(room);
             }
             _onlineClients[handler].IDRoom = -1;
         }
