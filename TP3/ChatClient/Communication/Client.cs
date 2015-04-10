@@ -214,6 +214,32 @@ namespace ChatClient
             }
         }
 
+        public static void DeleteMessage(int messageID)
+        {
+            try
+            {
+                Send(CommandType.DeleteMessage, messageID.ToString());
+                sendDone.WaitOne();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+
+        public static void SendLike(Like like)
+        {
+            try
+            {
+                Send(CommandType.SendLike, like.Serialize());
+                sendDone.WaitOne();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+
         public static bool DisconnectClient()
         {
             try
