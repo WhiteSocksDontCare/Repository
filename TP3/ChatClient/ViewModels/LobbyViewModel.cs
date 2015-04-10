@@ -13,12 +13,14 @@ using MVVM.Container;
 using System.Collections.ObjectModel;
 using ChatClient.Utils;
 using System.Windows.Forms;
+using System.IO;
 
 namespace ChatClient.ViewModels
 {
     class LobbyViewModel : BindableBase
     {
         private Lobby _lobby;
+        private string _avatarPath;
         //private Profile _userProfile;
         //private readonly Lazy<ObservableCollection<RoomItemViewModel>> _roomItems;
         private RoomViewModel _roomViewModel;
@@ -47,7 +49,21 @@ namespace ChatClient.ViewModels
         public Lobby Lobby
         {
             get { return _lobby; }
-            set { SetProperty(ref _lobby, value); }
+            set 
+            { 
+                SetProperty(ref _lobby, value);
+                AvatarPath = _lobby.ClientProfile.AvatarUri;
+            }
+        }
+
+        public string AvatarPath
+        {
+            get { return _avatarPath; }
+            set
+            {
+                _avatarPath = Path.GetFullPath(value);
+                OnPropertyChanged("AvatarPath");
+            }
         }
 
         public RoomViewModel RoomViewModel

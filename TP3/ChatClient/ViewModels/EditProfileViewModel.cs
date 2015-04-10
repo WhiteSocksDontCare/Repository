@@ -18,39 +18,59 @@ namespace ChatClient.ViewModels
     class EditProfileViewModel : BindableBase
     {
         Profile _profile;
+        private int _avatarIndex;
+        private string _avatarPath;
 
         public EditProfileViewModel()
         {
-            BrowseCommand = new DelegateCommand<object>(BrowseImage);
             CancelCommand = new DelegateCommand(CancelModification);
             SaveCommand = new DelegateCommand(SaveModification);
-            _profile = new Profile();
+            Profile = new Profile();
         }
 
         public Profile Profile
         {
             get { return _profile; }
-            set { SetProperty(ref _profile, value); }
-        }
+            set 
+            { 
+                SetProperty(ref _profile, value);
 
-        public ICommand CancelCommand { get; private set; }
-        public ICommand SaveCommand { get; private set; }
-        public ICommand BrowseCommand { get; private set; }
+                if (_profile.AvatarUri == null)
+                    AvatarIndex = 0;
+                else
+                {
+                    int temp;
 
-        public void BrowseImage(object imageControl)
-        {
-            OpenFileDialog fileDialog = new OpenFileDialog();
-            fileDialog.Filter = "Image Files(*.jpg; *.jpeg; *.gif; *.bmp; *.png)|*.jpg; *.jpeg; *.gif; *.bmp; *.png";
-            if (fileDialog.ShowDialog() == DialogResult.OK)
-            {
-                BitmapImage image = new BitmapImage();
-                image.BeginInit();
-                image.UriSource = new Uri(fileDialog.FileName);
-                image.EndInit();
-                ((Image)imageControl).Source = image;
-                Profile.AvatarUri = fileDialog.FileName;
+                    if (!Int32.TryParse(_profile.AvatarUri.Split(new char[] { '/', '.' })[1], out temp))
+                        AvatarIndex = 0;
+                    else
+                        AvatarIndex = temp - 1;
+                }
             }
         }
+
+        public int AvatarIndex
+        {
+            get { return _avatarIndex; }
+            set
+            {
+                _avatarIndex = value;
+                Profile.AvatarUri = AvatarPath = "Avatars/" + (_avatarIndex + 1).ToString() + ".jpg";
+            }
+        }
+
+        public string AvatarPath
+        {
+            get { return _avatarPath; }
+            set 
+            { 
+                _avatarPath = Path.GetFullPath(value);
+                OnPropertyChanged("AvatarPath");
+            }
+        }
+        
+        public ICommand CancelCommand { get; private set; }
+        public ICommand SaveCommand { get; private set; }
 
         public void SaveModification()
         {

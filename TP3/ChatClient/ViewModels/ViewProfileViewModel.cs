@@ -8,6 +8,7 @@ using Microsoft.Practices.Prism.Commands;
 using System.Windows.Input;
 using ChatCommunication;
 using MVVM.Container;
+using System.IO;
 
 namespace ChatClient.ViewModels
 {
@@ -15,6 +16,7 @@ namespace ChatClient.ViewModels
     {
 
         Profile _profile;
+        string _avatarPath;
 
         public ViewProfileViewModel()
         {
@@ -26,7 +28,21 @@ namespace ChatClient.ViewModels
         public Profile Profile
         {
             get { return _profile; }
-            set { SetProperty(ref _profile, value); }
+            set
+            {
+                SetProperty(ref _profile, value);
+                AvatarPath = _profile.AvatarUri;
+            }
+        }
+
+        public string AvatarPath
+        {
+            get { return _avatarPath; }
+            set
+            {
+                _avatarPath = Path.GetFullPath(value);
+                OnPropertyChanged("AvatarPath");
+            }
         }
 
         //public ICommand EditCommand { get; private set; }

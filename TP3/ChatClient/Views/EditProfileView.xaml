@@ -29,10 +29,7 @@
                Margin="155,63,0,0" 
                VerticalAlignment="Top" 
                Width="117"
-               Source="{Binding Path=Profile.AvatarUri}"/>
-        <Button Content="Browse" HorizontalAlignment="Left" Margin="155,171,0,0" VerticalAlignment="Top" Width="75"
-                Command="{Binding BrowseCommand}"
-                CommandParameter="{Binding ElementName=ImgAvatar}"/>
+               Source="{Binding Path=AvatarPath}"/>
         <Label Content="Informations" FontWeight="Bold" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
         <Label Content="Statistics" FontWeight="Bold" HorizontalAlignment="Left" Margin="10,211,0,0" VerticalAlignment="Top"/>
         <Label Content="Number of messages liked :" HorizontalAlignment="Left" Margin="10,242,0,0" VerticalAlignment="Top"/>
@@ -48,5 +45,13 @@
                 Command="{Binding CancelCommand}"/>
         <Button Content="Save" HorizontalAlignment="Left" Margin="114,351,0,0" Padding="5" VerticalAlignment="Top" Width="99"
                 Command="{Binding SaveCommand}"/>
+        <ComboBox HorizontalAlignment="Left" Margin="155,171,0,0" VerticalAlignment="Top" Width="117" Height="23" SelectedIndex="{Binding AvatarIndex}">
+            <ComboBoxItem IsSelected="True">Grumpy Cat</ComboBoxItem>
+            <ComboBoxItem>Troll Face</ComboBoxItem>
+            <ComboBoxItem>Doge</ComboBoxItem>
+            <ComboBoxItem>Alien Guy</ComboBoxItem>
+            <ComboBoxItem>Dos Equis Guy</ComboBoxItem>
+            <ComboBoxItem>Bad Luck Brian</ComboBoxItem>
+        </ComboBox>
     </Grid>
 </UserControl>

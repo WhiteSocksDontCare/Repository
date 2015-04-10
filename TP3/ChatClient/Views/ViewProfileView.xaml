@@ -22,7 +22,7 @@
         <Label HorizontalAlignment="Left" Height="23" Margin="10,171,0,0" VerticalAlignment="Top" Width="120"
                Content="{Binding Profile.LastName}"/>
         <Label Content="Avatar&#xD;&#xA;" HorizontalAlignment="Left" Margin="155,37,0,0" VerticalAlignment="Top"/>
-        <Image HorizontalAlignment="Left" Height="103" Margin="155,63,0,0" VerticalAlignment="Top" Width="117" Source="{Binding Path=Profile.AvatarUri}"/>
+        <Image HorizontalAlignment="Left" Height="103" Margin="155,63,0,0" VerticalAlignment="Top" Width="117" Source="{Binding Path=AvatarPath}"/>
         <Label Content="Informations" FontWeight="Bold" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
         <Label Content="Statistics" FontWeight="Bold" HorizontalAlignment="Left" Margin="10,211,0,0" VerticalAlignment="Top"/>
         <Label Content="Number of messages liked :" HorizontalAlignment="Left" Margin="10,242,0,0" VerticalAlignment="Top"/>
