@@ -77,10 +77,10 @@ namespace ChatServer
                 client.Key.Close();
             }
 
-            foreach(var room in _rooms)
-            {
-                room.SubscribedUsers = new ObservableCollection<Profile>();
-            }
+            //foreach (var room in _rooms)
+            //{
+            //    room.SubscribedUsers = new ObservableCollection<Profile>();
+            //}
 
             ServerInfosTimerElapsed(null, null);
         }
@@ -413,7 +413,7 @@ namespace ChatServer
             {
                 Send(socket, CommandType.Error, "Nom d'usager déjà existant");
                 Send(socket, CommandType.SubscribeAnswer, "False");
-                _semaphoreUsers.WaitOne();
+                _semaphoreUsers.Release();
                 return;
             }
             _semaphoreUsers.Release();
