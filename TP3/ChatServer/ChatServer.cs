@@ -413,6 +413,7 @@ namespace ChatServer
             {
                 Send(socket, CommandType.Error, "Pseudo already existing");
                 Send(socket, CommandType.SubscribeAnswer, "False");
+                _semaphoreUsers.WaitOne();
                 return;
             }
             _semaphoreUsers.Release();
