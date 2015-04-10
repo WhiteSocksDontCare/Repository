@@ -77,7 +77,7 @@
                  VerticalAlignment="Top"
                  Width="266" />
 
-        <Button Content="Envoyer"
+        <Button Content="Send"
                 Command="{Binding SendMessageCommand}"
                 HorizontalAlignment="Left"
                 Margin="287,313,0,0"
@@ -85,7 +85,7 @@
                 Width="143"
                 Height="49" />
 
-        <Button Content="Quitter salle"
+        <Button Content="Leave Room"
                 Command="{Binding LeaveRoomCommand}"
                 HorizontalAlignment="Left"
                 Margin="334,37,0,0"

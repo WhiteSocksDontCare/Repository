@@ -14,6 +14,7 @@
     <UserControl.Resources>
         <VM:LobbyViewModel x:Key="DesignViewModel" />
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></converters:BooleanToVisibilityConverter>
+        <converters:UserConnectedConverter x:Key="UserConnectedConverter"></converters:UserConnectedConverter>
     </UserControl.Resources>
 
     <Grid d:DataContext="{StaticResource DesignViewModel}">
@@ -23,14 +24,42 @@
                   Height="140"
                   Width="143" 
                   ItemsSource="{Binding Lobby.OtherUsers, UpdateSourceTrigger=PropertyChanged}">
+            <ListView.Resources>
+                <ContextMenu x:Key="ItemContextMenu">
+                    <MenuItem Header="View Profile" 
+                              Command="{Binding Path=DataContext.ViewOtherProfileCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}"
+                              CommandParameter="{Binding}" />
+                </ContextMenu>
+            </ListView.Resources>
+
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}" >
+                    <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
+                </Style>
+            </ListView.ItemContainerStyle>
+
             <ListView.ItemTemplate>
+                <DataTemplate>
+                    <WrapPanel>
+                        <TextBlock>
+                            <TextBlock.Text>
+                                <MultiBinding Converter="{StaticResource UserConnectedConverter}">
+                                    <Binding Path="Pseudo" />
+                                    <Binding Path="IsConnected" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </WrapPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+            <!--<ListView.ItemTemplate>
                 <DataTemplate>
                     <WrapPanel>
                         <Image></Image>
                         <TextBlock Text="{Binding Pseudo}"></TextBlock>
                     </WrapPanel>
                 </DataTemplate>
-            </ListView.ItemTemplate>
+            </ListView.ItemTemplate>-->
         </ListView>
         <ListView HorizontalAlignment="Left"
                   Margin="10,335,0,0"
@@ -59,19 +88,9 @@
                     </WrapPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>
-            <!--<ListView.ItemTemplate>
-                <DataTemplate>
-                    <WrapPanel>
-                        <TextBlock Text="{Binding Name}" FontWeight="Bold" />
-                        <Button Command="{Binding RelativeSource={RelativeSource FindAncestor,AncestorType={x:Type ListView}},Path=DataContext.JoinRoomCommand}" 
-                                CommandParameter="{Binding}" 
-                                Content="{Binding Path=Name}"/>
-                    </WrapPanel>
-                </DataTemplate>
-            </ListView.ItemTemplate>-->
         </ListView>
 
-        <Button Content="Déconnecter"
+        <Button Content="Logout"
                 Command="{Binding DisconnectCommand}"
                 HorizontalAlignment="Left"
                 Margin="524,63,0,0"
@@ -79,26 +98,26 @@
                 Width="93"
                 Height="31" />
 
-        <Button Content="Voir profil"
+        <Button Content="View Profile"
                 Command="{Binding ViewProfileCommand}"
                 HorizontalAlignment="Left"
                 Margin="110,102,0,0"
                 VerticalAlignment="Top"
                 Width="96"
                 Height="31" />
-        <Button Content="Modifier profil"
+        <Button Content="Edit Profile"
                 Command="{Binding EditProfileCommand}"
                 HorizontalAlignment="Left"
                 Margin="110,63,0,0"
                 VerticalAlignment="Top"
                 Width="96"
                 Height="31" />
-        <Label Content="Utilisateurs"
+        <Label Content="Users"
                HorizontalAlignment="Left"
                Margin="10,133,0,0"
                VerticalAlignment="Top"
                Width="133" />
-        <Label Content="Salles de discussion"
+        <Label Content="Chat Rooms"
                HorizontalAlignment="Left"
                Margin="10,309,0,0"
                VerticalAlignment="Top"
@@ -110,12 +129,12 @@
                Width="100" />
         <Label Content="{Binding Lobby.ClientProfile.Pseudo}"
                HorizontalAlignment="Left"
-               Margin="115,45,0,0"
+               Margin="115,30,0,0"
                VerticalAlignment="Top"/>
         <WrapPanel Margin="174,133,10,9.4" Orientation="Vertical" Visibility="{Binding IsInRoom, Converter={StaticResource BooleanToVisibilityConverter}, UpdateSourceTrigger=Default}">
             <views:RoomView DataContext="{Binding RoomViewModel}"/>
         </WrapPanel>
-        <Button Content="Nouvelle Salle"
+        <Button Content="Create Room"
         	Command="{Binding CreateRoomCommand}"
         	HorizontalAlignment="Left"
         	Margin="29,495,0,0"
