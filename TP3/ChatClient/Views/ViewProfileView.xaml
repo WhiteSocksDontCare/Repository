@@ -13,7 +13,7 @@
     </UserControl.Resources>
     <Grid d:DataContext="{StaticResource DesignViewModel}">
         <Label Content="Pseudo" HorizontalAlignment="Left" Margin="10,37,0,0" VerticalAlignment="Top"/>
-        <Label HorizontalAlignment="Left" Height="23" Margin="10,63,0,0" VerticalAlignment="Top" Width="120"
+        <Label HorizontalAlignment="Left" Height="35" Margin="10,63,0,0" VerticalAlignment="Top" Width="120"
                Content="{Binding Profile.Pseudo}"/>
         <Label Content="First name" HorizontalAlignment="Left" Margin="10,91,0,0" VerticalAlignment="Top"/>
         <Label HorizontalAlignment="Left" Height="23" Margin="10,117,0,0" VerticalAlignment="Top" Width="120"

@@ -16,6 +16,24 @@
                  VerticalAlignment="Top"
                  Width="266"
                  ItemsSource="{Binding Room.Messages, UpdateSourceTrigger=PropertyChanged}">
+            <ListView.Resources>
+                <ContextMenu x:Key="ItemContextMenu">
+                    <MenuItem Header="Delete" 
+                              Command="{Binding Path=DataContext.DeleteCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}"
+                              CommandParameter="{Binding}" />
+                    <MenuItem Header="Like" 
+                              Command="{Binding Path=DataContext.LikeCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}"
+                              CommandParameter="{Binding}" />
+                    <MenuItem Header="Dislike" 
+                              Command="{Binding Path=DataContext.DislikeCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}"
+                              CommandParameter="{Binding}" />
+                </ContextMenu>
+            </ListView.Resources>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}" >
+                    <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
+                </Style>
+            </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <WrapPanel>
@@ -55,11 +73,11 @@
                  Height="49"
                  Margin="13,313,0,0"
                  TextWrapping="Wrap"
-                 Text="{Binding Message.Text, Mode=TwoWay}"
+                 Text="{Binding Message.Text, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
                  VerticalAlignment="Top"
                  Width="266" />
 
-        <Button Content="Envoyer"
+        <Button Content="Send"
                 Command="{Binding SendMessageCommand}"
                 HorizontalAlignment="Left"
                 Margin="287,313,0,0"
@@ -67,7 +85,7 @@
                 Width="143"
                 Height="49" />
 
-        <Button Content="Quitter salle"
+        <Button Content="Leave Room"
                 Command="{Binding LeaveRoomCommand}"
                 HorizontalAlignment="Left"
                 Margin="334,37,0,0"
