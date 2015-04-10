@@ -32,5 +32,11 @@ namespace ChatClient.Views
             DataContext = Container.GetA<MainViewModel>();
             Container.GetA<MainViewModel>().NavigateToView(Container.GetA<LoginViewModel>());
         }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (Container.GetA<MainViewModel>().CurrentView.GetType() != typeof(LoginViewModel))
+                Container.GetA<LobbyViewModel>().Disconnect();
+        }
     }
 }

@@ -31,21 +31,21 @@ namespace ChatServer
     class ChatServer
     {
         //Jajoute un 0 pour pas se faire spammer en debug
-        private static double UPDATE_INTERVAL = 100000;  //Intervalle de temps entre deux mises à jour des lobbys vers les clients (30 secondes)
-        private static double SAVE_INTERVAL = 600000;  //Intervalle de temps entre deux save des listes dans le fichier XML (10 minutes)
+        private static double UPDATE_INTERVAL = 10000;  //Intervalle de temps entre deux mises à jour des lobbys vers les clients (10 secondes)
+        private static double SAVE_INTERVAL = 90000;  //Intervalle de temps entre deux save des listes dans le fichier XML (1.5 minutes)
         private static string PROFILES_FILE = "profiles.xml";
         private static string ROOMS_FILE = "rooms.xml";
         private static string LIKES_FILE = "likes.xml";
         private static string USERS_FILE = "users.xml";
         private static string MESSAGES_FILE = "messages.xml";
 
-        //private static Semaphore _semaphoreOnlineClients = new Semaphore(1, 1);
-        //private static Semaphore _semaphoreProfiles = new Semaphore(1, 1);
-        //private static Semaphore _semaphoreRooms = new Semaphore(1, 1);
-        //private static Semaphore _semaphoreLikes = new Semaphore(1, 1);
-        //private static Semaphore _semaphoreUsers = new Semaphore(1, 1);
-        //private static Semaphore _semaphoreMessages = new Semaphore(1, 1);
-        //private static Semaphore _semaphoreLobby = new Semaphore(1, 1);
+        private static Semaphore _semaphoreOnlineClients = new Semaphore(1, 1);
+        private static Semaphore _semaphoreProfiles = new Semaphore(1, 1);
+        private static Semaphore _semaphoreRooms = new Semaphore(1, 1);
+        private static Semaphore _semaphoreLikes = new Semaphore(1, 1);
+        private static Semaphore _semaphoreUsers = new Semaphore(1, 1);
+        private static Semaphore _semaphoreMessages = new Semaphore(1, 1);
+        private static Semaphore _semaphoreLobby = new Semaphore(1, 1);
 
         private static Socket _listener = null;
         public static ManualResetEvent _allDone = new ManualResetEvent(false);
@@ -87,35 +87,35 @@ namespace ChatServer
 
         public static void LoadServerInfos()
         {
-            //_semaphoreProfiles.WaitOne();
+            _semaphoreProfiles.WaitOne();
             List<Profile> tempProfiles;
             if ((tempProfiles = ChatCommunication.SerializerHelper.DeserializeFromXML<List<Profile>>(PROFILES_FILE)) != null)
                 _profiles = tempProfiles;
-            //_semaphoreProfiles.Release();
+            _semaphoreProfiles.Release();
 
-            //_semaphoreRooms.WaitOne();
+            _semaphoreRooms.WaitOne();
             List<Room> tempRooms;
             if ((tempRooms = ChatCommunication.SerializerHelper.DeserializeFromXML<List<Room>>(ROOMS_FILE)) != null)
                 _rooms = tempRooms;
-            //_semaphoreRooms.Release();
+            _semaphoreRooms.Release();
 
-            //_semaphoreLikes.WaitOne();
+            _semaphoreLikes.WaitOne();
             List<Like> tempLikes;
             if ((tempLikes = ChatCommunication.SerializerHelper.DeserializeFromXML<List<Like>>(LIKES_FILE)) != null)
                 _likes = tempLikes;
-            //_semaphoreLikes.Release();
+            _semaphoreLikes.Release();
 
-            //_semaphoreUsers.WaitOne();
+            _semaphoreUsers.WaitOne();
             List<User> tempUsers;
             if ((tempUsers = ChatCommunication.SerializerHelper.DeserializeFromXML<List<User>>(USERS_FILE)) != null)
                 _users = tempUsers;
-            //_semaphoreUsers.Release();
+            _semaphoreUsers.Release();
 
-            //_semaphoreMessages.WaitOne();
+            _semaphoreMessages.WaitOne();
             List<Message> tempMessages;
             if ((tempMessages = ChatCommunication.SerializerHelper.DeserializeFromXML<List<Message>>(MESSAGES_FILE)) != null)
                 _messages = tempMessages;
-            //_semaphoreMessages.Release();
+            _semaphoreMessages.Release();
         }
 
         public static void ServerInfosTimer()
@@ -130,25 +130,25 @@ namespace ChatServer
 
         public static void ServerInfosTimerElapsed(object source, ElapsedEventArgs e)
         {
-            //_semaphoreProfiles.WaitOne();
+            _semaphoreProfiles.WaitOne();
             ChatCommunication.SerializerHelper.SerializeToXML(_profiles, PROFILES_FILE);
-            //_semaphoreProfiles.Release();
+            _semaphoreProfiles.Release();
 
-            //_semaphoreRooms.WaitOne();
+            _semaphoreRooms.WaitOne();
             ChatCommunication.SerializerHelper.SerializeToXML(_rooms, ROOMS_FILE);
-            //_semaphoreRooms.Release();
+            _semaphoreRooms.Release();
 
-            //_semaphoreLikes.WaitOne();
+            _semaphoreLikes.WaitOne();
             ChatCommunication.SerializerHelper.SerializeToXML(_likes, LIKES_FILE);
-            //_semaphoreLikes.Release();
+            _semaphoreLikes.Release();
 
-            //_semaphoreUsers.WaitOne();
+            _semaphoreUsers.WaitOne();
             ChatCommunication.SerializerHelper.SerializeToXML(_users, USERS_FILE);
-            //_semaphoreUsers.Release();
+            _semaphoreUsers.Release();
 
-            //_semaphoreMessages.WaitOne();
+            _semaphoreMessages.WaitOne();
             ChatCommunication.SerializerHelper.SerializeToXML(_messages, MESSAGES_FILE);
-            //_semaphoreMessages.Release();
+            _semaphoreMessages.Release();
         }
 
         public static void UpdateLobbyTimer()
@@ -165,8 +165,7 @@ namespace ChatServer
         {
             //_semaphoreOnlineClients.WaitOne();
 
-            foreach (KeyValuePair<Socket, Profile> client in _onlineClients)
-                UpdateLobby(client.Key, client.Value);
+            UpdateAllLobby();
 
             //_semaphoreOnlineClients.Release();
         }
@@ -301,7 +300,12 @@ namespace ChatServer
                     case CommandType.LeaveRoom:
                         {
                             LeaveRoom(socket, Convert.ToInt32(messageArray[1]));
-                            UpdateLobby(socket, _onlineClients[socket]);
+
+                            _semaphoreOnlineClients.WaitOne();
+                            var profile = _onlineClients[socket];
+                            _semaphoreOnlineClients.Release();
+
+                            UpdateLobby(socket, profile);
                             break;
                         }
                     case CommandType.SendMessage:
@@ -359,37 +363,40 @@ namespace ChatServer
         /// <param name="user"></param>
         private static void TryConnect(Socket socket, User user)
         {
-            //_semaphoreOnlineClients.WaitOne();
+            _semaphoreOnlineClients.WaitOne();
             foreach (var pair in _onlineClients)
             {
                 if (user.Pseudo == ((Profile)pair.Value).Pseudo)
                 {
                     Send(socket, CommandType.Error, "User is already connected");
                     Send(socket, CommandType.LoginAnswer, "False");
+                    _semaphoreOnlineClients.Release();
                     return;
                 }
             }
-            //_semaphoreOnlineClients.Release();
+            _semaphoreOnlineClients.Release();
 
-            //_semaphoreUsers.WaitOne();
+            _semaphoreUsers.WaitOne();
             if (_users.Find(x => x.Pseudo == user.Pseudo && x.Password == user.Password) == null)
             {
                 Send(socket, CommandType.Error, "Invalid pseudo or password.");
                 Send(socket, CommandType.LoginAnswer, "False");
+                _semaphoreUsers.Release();
                 return;
             }
-            //_semaphoreUsers.Release();
+            _semaphoreUsers.Release();
 
-            //_semaphoreProfiles.WaitOne();
+            _semaphoreProfiles.WaitOne();
             var profile = _profiles.Find(x => x.Pseudo == user.Pseudo);
-            //_semaphoreProfiles.Release();
+            _semaphoreProfiles.Release();
 
-            //_semaphoreOnlineClients.WaitOne();
+            _semaphoreOnlineClients.WaitOne();
             _onlineClients[socket] = profile;
             _onlineClients[socket].IsConnected = true;
-            //_semaphoreOnlineClients.Release();
+            _semaphoreOnlineClients.Release();
+
             UpdateAllLobby();
-            //UpdateLobby(socket, profile);
+
             Send(socket, CommandType.LoginAnswer, "True");
         }
 
@@ -401,27 +408,27 @@ namespace ChatServer
         /// <param name="user"></param>
         private static void Subscribe(Socket socket, User user)
         {
-            //_semaphoreUsers.WaitOne();
+            _semaphoreUsers.WaitOne();
             if (_users.Find(x => x.Pseudo == user.Pseudo) != null)
             {
                 Send(socket, CommandType.Error, "Pseudo already existing");
                 Send(socket, CommandType.SubscribeAnswer, "False");
                 return;
             }
-            //_semaphoreUsers.Release();
+            _semaphoreUsers.Release();
 
             var bidon = new Profile { Pseudo = user.Pseudo, IDRoom = -1, IsConnected= true };
-            //_semaphoreProfiles.WaitOne();
+            _semaphoreProfiles.WaitOne();
             _profiles.Add(bidon);
-            //_semaphoreProfiles.Release();
+            _semaphoreProfiles.Release();
 
-            //_semaphoreOnlineClients.WaitOne();
+            _semaphoreOnlineClients.WaitOne();
             _onlineClients[socket] = bidon;
-            //_semaphoreOnlineClients.Release();
+            _semaphoreOnlineClients.Release();
 
-            //_semaphoreUsers.WaitOne();
+            _semaphoreUsers.WaitOne();
             _users.Add(user);
-            //_semaphoreUsers.Release();
+            _semaphoreUsers.Release();
 
             UpdateAllLobby();
             Send(socket, CommandType.SubscribeAnswer, "True");
@@ -433,12 +440,11 @@ namespace ChatServer
         /// <param name="socket"></param>
         private static void Logout(Socket socket)
         {
-            //_semaphoreOnlineClients.WaitOne();
+            _semaphoreOnlineClients.WaitOne();
             _onlineClients[socket].IsConnected = false;
             _onlineClients.Remove(socket);
-            foreach (var client in _onlineClients)
-                UpdateLobby(client.Key, client.Value);
-            //_semaphoreOnlineClients.Release();
+            _semaphoreOnlineClients.Release(); 
+            UpdateAllLobby();            
         }
 
         /// <summary>
@@ -449,16 +455,15 @@ namespace ChatServer
         /// <param name="newProfile"></param>
         private static void EditProfile(Socket socket, Profile newProfile)
         {
-            //_semaphoreProfiles.WaitOne();
+            _semaphoreProfiles.WaitOne();
             var profile = _profiles.Find(x => x.Pseudo == newProfile.Pseudo);
-            //_semaphoreProfiles.Release();
+            _semaphoreProfiles.Release();
 
-            //profiles[profiles.IndexOf(profile)] = newProfile;
-            //_semaphoreOnlineClients.WaitOne();
+            _semaphoreOnlineClients.WaitOne();
             _onlineClients[socket].FirstName = newProfile.FirstName;
             _onlineClients[socket].LastName = newProfile.LastName;
             _onlineClients[socket].AvatarUri = newProfile.AvatarUri;
-            //_semaphoreOnlineClients.Release();
+            _semaphoreOnlineClients.Release();
             Send(socket, CommandType.Info, "The profile has been updated");
             Send(socket, CommandType.EditProfileAnswer, "True");
         }
@@ -470,9 +475,9 @@ namespace ChatServer
         /// <param name="username"></param>
         private static void ViewProfile(Socket socket, string username)
         {
-            //_semaphoreProfiles.WaitOne();
+            _semaphoreProfiles.WaitOne();
             var profile = _profiles.Find(x => x.Pseudo == username);
-            //_semaphoreProfiles.Release();
+            _semaphoreProfiles.Release();
 
             var serializedProfile = profile.Serialize();
             Send(socket, CommandType.ViewProfile, serializedProfile);
@@ -486,16 +491,15 @@ namespace ChatServer
         private static void CreateRoom(Socket socket, Room room)
         {
             //create a new room and affect only name, description and correct ID.
-            //_semaphoreRooms.WaitOne();
-
+            _semaphoreRooms.WaitOne();
             if (_rooms.Count > 0)
                 room.IDRoom = _rooms.Max(x => x.IDRoom) + 1;
             else
                 room.IDRoom = 0;
 
             _rooms.Add(room);
+            _semaphoreRooms.Release();
 
-            //_semaphoreRooms.Release();
             //put the user in this room => updateRoom and updateLobby
             JoinRoom(socket, room.IDRoom);
             UpdateAllLobby();
@@ -515,23 +519,30 @@ namespace ChatServer
             }
 
             //leave room if he is already in one and create a new one
-            if (_onlineClients[socket].IDRoom != -1)
-                LeaveRoom(socket, _onlineClients[socket].IDRoom);
+            _semaphoreOnlineClients.WaitOne();
+            int id = _onlineClients[socket].IDRoom ;
+            _semaphoreOnlineClients.Release();
 
-            //_semaphoreRooms.WaitOne();
+            if (id != -1)
+                LeaveRoom(socket, id);
+
+            _semaphoreRooms.WaitOne();
             var room = _rooms.Find(x => x.IDRoom == idRoom);
+            _semaphoreRooms.Release();
+
+            _semaphoreOnlineClients.WaitOne();
             _onlineClients[socket].IDRoom = idRoom;
             room.SubscribedUsers.Add(_onlineClients[socket]);
             UpdateLobby(socket, _onlineClients[socket]);
-            //_semaphoreRooms.Release();            
+            _semaphoreOnlineClients.Release();
 
-            //_semaphoreOnlineClients.WaitOne();
+            _semaphoreOnlineClients.WaitOne();
             foreach (var profile in room.SubscribedUsers)
             {
                 var s = _onlineClients.FirstOrDefault(x => x.Value == profile).Key;
                 Send(s, CommandType.UpdateRoom, room.Serialize());
             }
-            //_semaphoreOnlineClients.Release();
+            _semaphoreOnlineClients.Release();
         }
 
         /// <summary>
@@ -541,21 +552,26 @@ namespace ChatServer
         /// <param name="idRoom"></param>
         private static void LeaveRoom(Socket handler, int idRoom)
         {
-            //_semaphoreRooms.WaitOne();
+            _semaphoreRooms.WaitOne();
             var room = _rooms.Find(x => x.IDRoom == idRoom);
-            //_semaphoreRooms.Release();
-
             room.SubscribedUsers.Remove(_onlineClients[handler]);
-            if (room.SubscribedUsers.Count <= 0)
+            int count = room.SubscribedUsers.Count;
+            _semaphoreRooms.Release();
+
+            if (count <= 0)
             {
+                _semaphoreRooms.WaitOne();
                 room.IsDeleted = true;
+                _semaphoreRooms.Release();
                 UpdateAllLobby();
             }
             else
             {
                 UpdateRoom(room);
             }
+            _semaphoreOnlineClients.WaitOne();
             _onlineClients[handler].IDRoom = -1;
+            _semaphoreOnlineClients.Release();
         }
 
         /// <summary>
@@ -565,7 +581,7 @@ namespace ChatServer
         /// <param name="message"></param>
         public static void SendMessage(Message message)
         {
-            //_semaphoreMessages.WaitOne();
+            _semaphoreMessages.WaitOne();
             if (_messages.Count > 0)
                 message.IDMessage = _messages.Max(x => x.IDMessage) + 1;
             else
@@ -573,15 +589,14 @@ namespace ChatServer
 
             // Ajoute à la liste de message du serveur
             _messages.Add(message);
-            //_semaphoreMessages.Release();
+            _semaphoreMessages.Release();
 
-            //_semaphoreRooms.WaitOne();
+            _semaphoreRooms.WaitOne();
             var room = _rooms.Find(x => x.IDRoom == message.IDRoom);
-            //_semaphoreRooms.Release();
-
             // Ajoute à la liste de message
             room.Messages.Add(message);
             UpdateRoom(room);
+            _semaphoreRooms.Release();
         }
 
         /// <summary>
@@ -591,19 +606,17 @@ namespace ChatServer
         /// <param name="message"></param>
         public static void DeleteMessage(Message message)
         {
-            //_semaphoreMessages.WaitOne();
+            _semaphoreMessages.WaitOne();
             var message1 = _messages.Find(x => x.Pseudo == message.Pseudo);
-            //_semaphoreMessages.Release();
-
             message1.IsDeleted = true;
+            _semaphoreMessages.Release();
 
-            //_semaphoreRooms.WaitOne();
+            _semaphoreRooms.WaitOne();
             var room = _rooms.Find(x => x.IDRoom == message.IDRoom);
-            //_semaphoreRooms.Release();
-
             var message2 = room.Messages.First(x => x.IDMessage == message.IDMessage);
             message2.IsDeleted = true;
             UpdateRoom(room);
+            _semaphoreRooms.Release();
         }
 
         /// <summary>
@@ -612,9 +625,9 @@ namespace ChatServer
         /// <param name="like"></param>
         private static void SendLike(Like like)
         {
-            //_semaphoreLikes.WaitOne();
+            _semaphoreLikes.WaitOne();
             _likes.Add(like);
-            //_semaphoreLikes.Release();
+            _semaphoreLikes.Release();
         }
 
         /// <summary>
@@ -640,9 +653,9 @@ namespace ChatServer
                 //_semaphoreLikes.Release();
             }
 
-            //_semaphoreOnlineClients.WaitOne();
+            _semaphoreOnlineClients.WaitOne();
             List<Socket> listSockets = _onlineClients.Where(x => room.SubscribedUsers.Any(p => p == x.Value)).Select(x => x.Key).ToList();
-            //_semaphoreOnlineClients.Release();
+            _semaphoreOnlineClients.Release();
 
             foreach (var socket in listSockets)
             {
@@ -652,27 +665,29 @@ namespace ChatServer
 
         private static void UpdateAllLobby()
         {
-            //_semaphoreOnlineClients.WaitOne();
+            _semaphoreOnlineClients.WaitOne();
             foreach (var client in _onlineClients)
                 UpdateLobby(client.Key, client.Value);
-            //_semaphoreOnlineClients.Release();
+            _semaphoreOnlineClients.Release();
         }
         private static void UpdateLobby(Socket socket, Profile profile)
         {
-            //_semaphoreLobby.WaitOne();
+            _semaphoreLobby.WaitOne();
 
-            //_semaphoreRooms.WaitOne();
+            _semaphoreRooms.WaitOne();
             _lobby.AllRooms = new ObservableCollection<Room>(_rooms.Where(x => !x.IsDeleted));
-            //_semaphoreRooms.Release();
+            _semaphoreRooms.Release();
 
             _lobby.ClientProfile = profile;
+            _lobby.ClientProfile.NbMessage = _messages.Count(x => x.Pseudo == profile.Pseudo);
+            _lobby.ClientProfile.NbDeletedMessage = _messages.Count(x => x.Pseudo == profile.Pseudo && !x.IsDeleted);
 
-            //_semaphoreProfiles.WaitOne();
+            _semaphoreProfiles.WaitOne();
             _lobby.OtherUsers = new ObservableCollection<Profile>(_profiles.Where(x => x.Pseudo != profile.Pseudo));
-            //_semaphoreProfiles.Release();
+            _semaphoreProfiles.Release();
 
             Send(socket, CommandType.UpdateLobby, _lobby.Serialize());
-            //_semaphoreLobby.Release();
+            _semaphoreLobby.Release();
         }
     }
 }
