@@ -59,7 +59,11 @@ namespace ChatClient.ViewModels
         public Room Room
         {
             get { return _room; }
-            set { SetProperty(ref _room, value); }
+            set 
+            { 
+                SetProperty(ref _room, value);
+                Container.GetA<LobbyViewModel>().IsInRoom = true;
+            }
         }
         public Message Message
         {
