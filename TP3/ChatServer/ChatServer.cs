@@ -315,12 +315,12 @@ namespace ChatServer
                         }
                     case CommandType.DeleteMessage:
                         {
-                            DeleteMessage(messageArray[1].Deserialize<Message>());
+                            DeleteMessage(Convert.ToInt32(messageArray[1]));
                             break;
                         }
                     case CommandType.SendLike:
                         {
-                            SendLike(messageArray[1].Deserialize<Like>());
+                            SendLike(socket, messageArray[1].Deserialize<Like>());
                             break;
                         }
                     default:
@@ -533,7 +533,7 @@ namespace ChatServer
             _semaphoreRooms.Release();
 
             _semaphoreOnlineClients.WaitOne();
-            _onlineClients[socket].IDRoom = idRoom;
+            _onlineClients[socket].IDRoom = idRoom;            
             room.SubscribedUsers.Add(_onlineClients[socket]);
             UpdateLobby(socket, _onlineClients[socket]);
             _semaphoreOnlineClients.Release();
@@ -606,17 +606,23 @@ namespace ChatServer
         /// dans le dictionnaire onlineClients. Envoie finalement la salle à tous les sockets trouvés.
         /// </summary>
         /// <param name="message"></param>
-        public static void DeleteMessage(Message message)
+        public static void DeleteMessage(int messageID)
         {
             _semaphoreMessages.WaitOne();
-            var message1 = _messages.Find(x => x.Pseudo == message.Pseudo);
-            message1.IsDeleted = true;
+            var msg = _messages.Find(x => x.IDMessage == messageID);
+
+            if (msg == null)
+            {
+                _semaphoreMessages.Release();
+                return;
+            }
+
+            msg.IsDeleted = true;
             _semaphoreMessages.Release();
 
             _semaphoreRooms.WaitOne();
-            var room = _rooms.Find(x => x.IDRoom == message.IDRoom);
-            var message2 = room.Messages.First(x => x.IDMessage == message.IDMessage);
-            message2.IsDeleted = true;
+            var room = _rooms.Find(x => x.IDRoom == msg.IDRoom);
+            room.Messages.Remove(msg);
             UpdateRoom(room);
             _semaphoreRooms.Release();
         }
@@ -625,11 +631,23 @@ namespace ChatServer
         /// Ajoute le like à la liste
         /// </summary>
         /// <param name="like"></param>
-        private static void SendLike(Like like)
+        private static void SendLike(Socket socket, Like like)
         {
+            
+            like.Pseudo = _onlineClients[socket].Pseudo;
             _semaphoreLikes.WaitOne();
-            _likes.Add(like);
+
+            var l = _likes.Find(x => x.Pseudo == like.Pseudo && x.IDMessage == like.IDMessage);
+            if (l == null)
+                _likes.Add(like);
+            else
+                l.IsLike = like.IsLike;
             _semaphoreLikes.Release();
+
+            _semaphoreRooms.WaitOne();
+            var room = _rooms.First(x => x.IDRoom == _onlineClients[socket].IDRoom);
+            UpdateRoom(room);
+            _semaphoreRooms.Release();
         }
 
         /// <summary>
@@ -640,18 +658,11 @@ namespace ChatServer
         private static void UpdateRoom(Room room)
         {
             // Update nblike for each message
-            foreach (var message in room.Messages)
+            foreach (var message in room.Messages.Where(x => !x.IsDeleted && x.IDRoom == room.IDRoom))
             {
-                if (room.IDRoom != message.IDRoom) continue;
-
                 //_semaphoreLikes.WaitOne();
-                foreach (var like in _likes.Where(like => like.IDMessage == message.IDMessage))
-                {
-                    if (like.IsLike)
-                        message.NbLike++;
-                    else
-                        message.NbDislike++;
-                }
+                message.NbLike = _likes.Count(x => x.IDMessage == message.IDMessage && x.IsLike);
+                message.NbDislike = _likes.Count(x => x.IDMessage == message.IDMessage && !x.IsLike);
                 //_semaphoreLikes.Release();
             }
 

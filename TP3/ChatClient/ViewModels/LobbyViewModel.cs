@@ -29,8 +29,8 @@ namespace ChatClient.ViewModels
             ViewProfileCommand = new DelegateCommand(ViewProfile);
             CreateRoomCommand = new DelegateCommand(CreateRoom);
 
-            this.JoinRoomCommand = new DelegateCommand<Room>(JoinRoom);
-            this.ViewOtherProfileCommand = new DelegateCommand<Profile>(ViewOtherProfile);
+            JoinRoomCommand = new DelegateCommand<Room>(JoinRoom);
+            ViewOtherProfileCommand = new DelegateCommand<Profile>(ViewOtherProfile);
             
             _lobby = new Lobby();
             _roomViewModel = new RoomViewModel();
