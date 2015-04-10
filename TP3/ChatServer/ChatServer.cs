@@ -470,6 +470,7 @@ namespace ChatServer
         {
             //_semaphoreProfiles.WaitOne();
             var profile = _profiles.Find(x => x.Pseudo == username);
+            UpdateStats(profile);
             //_semaphoreProfiles.Release();
 
             var serializedProfile = profile.Serialize();
@@ -660,8 +661,7 @@ namespace ChatServer
             //_semaphoreRooms.Release();
 
             _lobby.ClientProfile = profile;
-            _lobby.ClientProfile.NbMessage = _messages.Count(x => x.Pseudo == profile.Pseudo);
-            _lobby.ClientProfile.NbDeletedMessage = _messages.Count(x => x.Pseudo == profile.Pseudo && !x.IsDeleted);
+            UpdateStats(profile);
 
             //_semaphoreProfiles.WaitOne();
             _lobby.OtherUsers = new ObservableCollection<Profile>(_profiles.Where(x => x.Pseudo != profile.Pseudo));
@@ -669,6 +669,19 @@ namespace ChatServer
 
             Send(socket, CommandType.UpdateLobby, _lobby.Serialize());
             //_semaphoreLobby.Release();
+        }
+
+        private static void UpdateStats(Profile profile)
+        {
+            profile.NbMessage = _messages.Count(x => x.Pseudo == profile.Pseudo);
+            profile.NbDeletedMessage = _messages.Count(x => x.Pseudo == profile.Pseudo && x.IsDeleted);
+            profile.NbLike = 0;
+            profile.NbDislike = 0;
+            foreach (var message in _messages.Where(x => x.Pseudo == profile.Pseudo))
+            {
+                profile.NbLike += _likes.Count(x => x.IDMessage == message.IDMessage && x.IsLike);
+                profile.NbDislike += _likes.Count(x => x.IDMessage == message.IDMessage && !x.IsLike);
+            }
         }
     }
 }
