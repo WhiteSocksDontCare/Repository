@@ -315,12 +315,12 @@ namespace ChatServer
                         }
                     case CommandType.DeleteMessage:
                         {
-                            DeleteMessage(messageArray[1].Deserialize<Message>());
+                            DeleteMessage(socket, Convert.ToInt32(messageArray[1]));
                             break;
                         }
                     case CommandType.SendLike:
                         {
-                            SendLike(messageArray[1].Deserialize<Like>());
+                            SendLike(socket, messageArray[1].Deserialize<Like>());
                             break;
                         }
                     default:
@@ -379,7 +379,7 @@ namespace ChatServer
             _semaphoreUsers.WaitOne();
             if (_users.Find(x => x.Pseudo == user.Pseudo && x.Password == user.Password) == null)
             {
-                Send(socket, CommandType.Error, "Nom d'usager ou mot de passe invalide");
+                Send(socket, CommandType.Error, "Invalid pseudo or password.");
                 Send(socket, CommandType.LoginAnswer, "False");
                 _semaphoreUsers.Release();
                 return;
@@ -411,7 +411,7 @@ namespace ChatServer
             _semaphoreUsers.WaitOne();
             if (_users.Find(x => x.Pseudo == user.Pseudo) != null)
             {
-                Send(socket, CommandType.Error, "Nom d'usager déjà existant");
+                Send(socket, CommandType.Error, "Pseudo already existing");
                 Send(socket, CommandType.SubscribeAnswer, "False");
                 _semaphoreUsers.Release();
                 return;
@@ -431,7 +431,7 @@ namespace ChatServer
             _users.Add(user);
             _semaphoreUsers.Release();
 
-            UpdateLobby(socket, bidon);
+            UpdateAllLobby();
             Send(socket, CommandType.SubscribeAnswer, "True");
         }
 
@@ -445,7 +445,7 @@ namespace ChatServer
             _onlineClients[socket].IsConnected = false;
             _onlineClients.Remove(socket);
             _semaphoreOnlineClients.Release(); 
-            UpdateAllLobby();            
+            UpdateAllLobby();
         }
 
         /// <summary>
@@ -478,6 +478,7 @@ namespace ChatServer
         {
             _semaphoreProfiles.WaitOne();
             var profile = _profiles.Find(x => x.Pseudo == username);
+            UpdateStats(profile);
             _semaphoreProfiles.Release();
 
             var serializedProfile = profile.Serialize();
@@ -566,6 +567,10 @@ namespace ChatServer
                 _semaphoreRooms.Release();
                 UpdateAllLobby();
             }
+            else
+            {
+                UpdateRoom(room);
+            }
             _semaphoreOnlineClients.WaitOne();
             _onlineClients[handler].IDRoom = -1;
             _semaphoreOnlineClients.Release();
@@ -601,17 +606,23 @@ namespace ChatServer
         /// dans le dictionnaire onlineClients. Envoie finalement la salle à tous les sockets trouvés.
         /// </summary>
         /// <param name="message"></param>
-        public static void DeleteMessage(Message message)
+        public static void DeleteMessage(Socket socket, int messageID)
         {
             _semaphoreMessages.WaitOne();
-            var message1 = _messages.Find(x => x.Pseudo == message.Pseudo);
-            message1.IsDeleted = true;
+            var msg = _messages.Find(x => x.IDMessage == messageID && x.Pseudo == _onlineClients[socket].Pseudo);
+
+            if (msg == null)
+            {
+                _semaphoreMessages.Release();
+                return;
+            }
+
+            msg.IsDeleted = true;
             _semaphoreMessages.Release();
 
             _semaphoreRooms.WaitOne();
-            var room = _rooms.Find(x => x.IDRoom == message.IDRoom);
-            var message2 = room.Messages.First(x => x.IDMessage == message.IDMessage);
-            message2.IsDeleted = true;
+            var room = _rooms.Find(x => x.IDRoom == msg.IDRoom);
+            room.Messages.Remove(msg);
             UpdateRoom(room);
             _semaphoreRooms.Release();
         }
@@ -620,11 +631,23 @@ namespace ChatServer
         /// Ajoute le like à la liste
         /// </summary>
         /// <param name="like"></param>
-        private static void SendLike(Like like)
+        private static void SendLike(Socket socket, Like like)
         {
+            
+            like.Pseudo = _onlineClients[socket].Pseudo;
             _semaphoreLikes.WaitOne();
-            _likes.Add(like);
+
+            var l = _likes.Find(x => x.IDMessage == like.IDMessage &&  x.Pseudo == like.Pseudo);
+            if (l == null)
+                _likes.Add(like);
+            else
+                l.IsLike = like.IsLike;
             _semaphoreLikes.Release();
+
+            _semaphoreRooms.WaitOne();
+            var room = _rooms.First(x => x.IDRoom == _onlineClients[socket].IDRoom);
+            UpdateRoom(room);
+            _semaphoreRooms.Release();
         }
 
         /// <summary>
@@ -635,18 +658,11 @@ namespace ChatServer
         private static void UpdateRoom(Room room)
         {
             // Update nblike for each message
-            foreach (var message in room.Messages)
+            foreach (var message in room.Messages.Where(x => !x.IsDeleted && x.IDRoom == room.IDRoom))
             {
-                if (room.IDRoom != message.IDRoom) continue;
-
                 //_semaphoreLikes.WaitOne();
-                foreach (var like in _likes.Where(like => like.IDMessage == message.IDMessage))
-                {
-                    if (like.IsLike)
-                        message.NbLike++;
-                    else
-                        message.NbDislike++;
-                }
+                message.NbLike = _likes.Count(x => x.IDMessage == message.IDMessage && x.IsLike);
+                message.NbDislike = _likes.Count(x => x.IDMessage == message.IDMessage && !x.IsLike);
                 //_semaphoreLikes.Release();
             }
 
@@ -676,8 +692,7 @@ namespace ChatServer
             _semaphoreRooms.Release();
 
             _lobby.ClientProfile = profile;
-            _lobby.ClientProfile.NbMessage = _messages.Count(x => x.Pseudo == profile.Pseudo);
-            _lobby.ClientProfile.NbDeletedMessage = _messages.Count(x => x.Pseudo == profile.Pseudo && !x.IsDeleted);
+            UpdateStats(profile);
 
             _semaphoreProfiles.WaitOne();
             _lobby.OtherUsers = new ObservableCollection<Profile>(_profiles.Where(x => x.Pseudo != profile.Pseudo));
@@ -685,6 +700,19 @@ namespace ChatServer
 
             Send(socket, CommandType.UpdateLobby, _lobby.Serialize());
             _semaphoreLobby.Release();
+        }
+
+        private static void UpdateStats(Profile profile)
+        {
+            profile.NbMessage = _messages.Count(x => x.Pseudo == profile.Pseudo);
+            profile.NbDeletedMessage = _messages.Count(x => x.Pseudo == profile.Pseudo && x.IsDeleted);
+            profile.NbLike = 0;
+            profile.NbDislike = 0;
+            foreach (var message in _messages.Where(x => x.Pseudo == profile.Pseudo))
+            {
+                profile.NbLike += _likes.Count(x => x.IDMessage == message.IDMessage && x.IsLike);
+                profile.NbDislike += _likes.Count(x => x.IDMessage == message.IDMessage && !x.IsLike);
+            }
         }
     }
 }

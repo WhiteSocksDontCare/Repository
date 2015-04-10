@@ -19,7 +19,8 @@ namespace ChatClient.ViewModels
     class LobbyViewModel : BindableBase
     {
         private Lobby _lobby;
-        private RoomViewModel _roomViewModel;        
+        private RoomViewModel _roomViewModel;
+        private bool _bidon = false;
 
         public LobbyViewModel()
         {
@@ -28,8 +29,8 @@ namespace ChatClient.ViewModels
             ViewProfileCommand = new DelegateCommand(ViewProfile);
             CreateRoomCommand = new DelegateCommand(CreateRoom);
 
-            this.JoinRoomCommand = new DelegateCommand<Room>(JoinRoom);
-            this.ViewOtherProfileCommand = new DelegateCommand<Profile>(ViewOtherProfile);
+            JoinRoomCommand = new DelegateCommand<Room>(JoinRoom);
+            ViewOtherProfileCommand = new DelegateCommand<Profile>(ViewOtherProfile);
             
             _lobby = new Lobby();
             _roomViewModel = new RoomViewModel();
@@ -38,7 +39,11 @@ namespace ChatClient.ViewModels
         public Lobby Lobby
         {
             get { return _lobby; }
-            set { SetProperty(ref _lobby, value); }
+            set 
+            { 
+                SetProperty(ref _lobby, value);
+                IsInRoom = true;
+            }
         }
 
         public RoomViewModel RoomViewModel
@@ -50,11 +55,10 @@ namespace ChatClient.ViewModels
         {
             //True si l'user a pas -1 et si on a recu la bonne room dans le updateRoom!
             get 
-            {
-                Console.WriteLine("Lobby.ClientProfile.IDRoom : {0}", Lobby.ClientProfile.IDRoom);
-                Console.WriteLine("RoomViewModel.Room.IDRoom : {0}", RoomViewModel.Room.IDRoom);                
+            {                             
                 return Lobby.ClientProfile.IDRoom != -1 && Lobby.ClientProfile.IDRoom == RoomViewModel.Room.IDRoom; 
             }
+            set { SetProperty(ref _bidon, !_bidon); }
         }
 
         public ICommand DisconnectCommand { get; private set; }

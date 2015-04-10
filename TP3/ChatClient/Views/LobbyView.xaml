@@ -131,7 +131,7 @@
                HorizontalAlignment="Left"
                Margin="115,30,0,0"
                VerticalAlignment="Top"/>
-        <WrapPanel Margin="174,133,10,9.4" Orientation="Vertical" Visibility="{Binding IsInRoom, Converter={StaticResource BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
+        <WrapPanel Margin="174,133,10,9.4" Orientation="Vertical" Visibility="{Binding IsInRoom, Converter={StaticResource BooleanToVisibilityConverter}, UpdateSourceTrigger=Default}">
             <views:RoomView DataContext="{Binding RoomViewModel}"/>
         </WrapPanel>
         <Button Content="Create Room"
