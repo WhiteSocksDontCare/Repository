@@ -40,7 +40,11 @@ namespace ChatClient.ViewModels
             get { return _avatarPath; }
             set
             {
-                _avatarPath = Path.GetFullPath(value);
+                if (value != null)
+                    _avatarPath = Path.GetFullPath(value);
+                else
+                    _avatarPath = "";
+
                 OnPropertyChanged("AvatarPath");
             }
         }
