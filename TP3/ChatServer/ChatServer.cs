@@ -116,6 +116,18 @@ namespace ChatServer
             if ((tempMessages = ChatCommunication.SerializerHelper.DeserializeFromXML<List<Message>>(MESSAGES_FILE)) != null)
                 _messages = tempMessages;
             _semaphoreMessages.Release();
+
+            _semaphoreRooms.WaitOne();
+            _semaphoreProfiles.WaitOne();
+            _semaphoreMessages.WaitOne();
+            foreach (var room in _rooms)
+            {
+                room.Messages = new ObservableCollection<Message>(_messages.Where(x => x.IDRoom == room.IDRoom));
+                room.SubscribedUsers = new ObservableCollection<Profile>(_profiles.Where(x => x.IDRoom == room.IDRoom));
+            }
+            _semaphoreRooms.Release();
+            _semaphoreProfiles.Release();
+            _semaphoreMessages.Release();
         }
 
         public static void ServerInfosTimer()
@@ -539,7 +551,7 @@ namespace ChatServer
             _semaphoreOnlineClients.Release();
 
             _semaphoreOnlineClients.WaitOne();
-            foreach (var profile in room.SubscribedUsers)
+            foreach (var profile in room.SubscribedUsers.Where(x => _onlineClients.Values.Any(y => x == y)))
             {
                 var s = _onlineClients.FirstOrDefault(x => x.Value == profile).Key;
                 Send(s, CommandType.UpdateRoom, room.Serialize());
