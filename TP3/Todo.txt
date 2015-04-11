@@ -1,5 +1,0 @@
-- View profile des autres users connectés
-- Delete message
-- Like/dislike message
-- Create / leave room qui s'update sans avoir a cliquer sur view profile
-- Avatar

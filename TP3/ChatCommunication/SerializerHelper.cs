@@ -50,6 +50,7 @@ namespace ChatCommunication
             try
             {
                 serializer = new XmlSerializer(typeof(T));
+
                 reader = new StringReader(toDeserialize);
                 obj = (T)serializer.Deserialize(reader);
             }
@@ -73,7 +74,11 @@ namespace ChatCommunication
             try
             {
                 serializer = new XmlSerializer(typeof(T));
-                writer = XmlWriter.Create(fileName);
+
+                XmlWriterSettings closeOutput = new XmlWriterSettings();
+                closeOutput.CloseOutput = true;
+
+                writer = XmlWriter.Create(fileName, closeOutput);
                 serializer.Serialize(writer, toSerialize);
             }
             catch (Exception ex)
@@ -96,7 +101,11 @@ namespace ChatCommunication
             try
             {
                 serializer = new XmlSerializer(typeof(T));
-                reader = XmlReader.Create(fileName);
+
+                XmlReaderSettings closeInput = new XmlReaderSettings();
+                closeInput.CloseInput = true;
+
+                reader = XmlReader.Create(fileName, closeInput);
                 obj = (T)serializer.Deserialize(reader);
             }
             catch (Exception ex)
