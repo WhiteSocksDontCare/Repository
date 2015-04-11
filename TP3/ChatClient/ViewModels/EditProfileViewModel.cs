@@ -84,7 +84,10 @@ namespace ChatClient.ViewModels
         {
             if (result)
             {
-                Container.GetA<LobbyViewModel>().Lobby.ClientProfile = this.Profile;
+                Lobby newLobby = Container.GetA<LobbyViewModel>().Lobby;
+                newLobby.ClientProfile = this.Profile;
+                Container.GetA<LobbyViewModel>().Lobby = newLobby;
+
                 Container.GetA<MainViewModel>().NavigateToView(Container.GetA<LobbyViewModel>());
             }
         }

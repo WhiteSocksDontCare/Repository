@@ -30,7 +30,6 @@ namespace ChatServer
 
     class ChatServer
     {
-        //Jajoute un 0 pour pas se faire spammer en debug
         private static double UPDATE_INTERVAL = 10000;  //Intervalle de temps entre deux mises à jour des lobbys vers les clients (10 secondes)
         private static double SAVE_INTERVAL = 90000;  //Intervalle de temps entre deux save des listes dans le fichier XML (1.5 minutes)
         private static string PROFILES_FILE = "profiles.xml";
@@ -439,7 +438,7 @@ namespace ChatServer
             }
             _semaphoreUsers.Release();
 
-            var bidon = new Profile { Pseudo = user.Pseudo, IDRoom = -1, IsConnected= true };
+            var bidon = new Profile { Pseudo = user.Pseudo, IDRoom = -1, IsConnected= true, AvatarUri="Avatars/1.jpg" };
             _semaphoreProfiles.WaitOne();
             _profiles.Add(bidon);
             _semaphoreProfiles.Release();
@@ -464,8 +463,20 @@ namespace ChatServer
         {
             _semaphoreOnlineClients.WaitOne();
             _onlineClients[socket].IsConnected = false;
+
+            int idRoom = _onlineClients[socket].IDRoom;
+
             _onlineClients.Remove(socket);
-            _semaphoreOnlineClients.Release(); 
+            _semaphoreOnlineClients.Release();
+
+            if (idRoom != -1)
+            {
+                _semaphoreRooms.WaitOne();
+                var room = _rooms.Find(x => x.IDRoom == idRoom);
+                _semaphoreRooms.Release();
+                UpdateRoom(room);
+            }
+
             UpdateAllLobby();
         }
 
